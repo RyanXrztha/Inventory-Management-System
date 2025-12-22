@@ -17,31 +17,37 @@ public class LoginFormController {
         String username = view.getUserName().trim();
         String password = view.getUserPassword().trim();
 
-        // --- VALIDATION HANDLED IN CONTROLLER ONLY ---
         if (username.isEmpty() && password.isEmpty()) {
-            JOptionPane.showMessageDialog(view, "Username and Password cannot be empty!", "Empty Fields", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(view, "Username and Password cannot be empty!", 
+                "Empty Fields", JOptionPane.WARNING_MESSAGE);
             return;
         }
+
         if (username.isEmpty()) {
-            JOptionPane.showMessageDialog(view, "Username cannot be empty!", "Empty Username", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(view, "Username cannot be empty!", 
+                "Empty Username", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         if (password.isEmpty()) {
-            JOptionPane.showMessageDialog(view, "Password cannot be empty!", "Empty Password", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(view, "Password cannot be empty!", 
+                "Empty Password", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
-        if(username.equals("admin") && password.equals("admin")){
-            AdminPanel Admin = new AdminPanel();
-            Admin.setVisible(true);
-        }
-        else{
-            CustomerPanel Customer = new CustomerPanel();
-            Customer.setVisible(true);
-        }
 
-        // If both are filled → Success for now
-        JOptionPane.showMessageDialog(view, "Login Successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+        if(username.equals("admin") && password.equals("admin")){
+            JOptionPane.showMessageDialog(view, "Admin Login Successful!", 
+                "Success", JOptionPane.INFORMATION_MESSAGE);
+            AdminPanel admin = new AdminPanel();
+            admin.setVisible(true);
+            view.dispose(); // ✅ Close login form
+        }
+        else {
+            JOptionPane.showMessageDialog(view, "Customer Login Successful!", 
+                "Success", JOptionPane.INFORMATION_MESSAGE);
+            CustomerPanel customer = new CustomerPanel();
+            customer.setVisible(true);
+            view.dispose(); // ✅ Close login form
+        }
     }
 }

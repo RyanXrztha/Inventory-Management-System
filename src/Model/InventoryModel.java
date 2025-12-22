@@ -9,6 +9,8 @@ import java.util.ArrayList;
  * @author aryan
  */
 public class InventoryModel {
+    private static InventoryModel instance = null;
+    
     final int size = 10;
     int front = -1;
     int rear = -1;
@@ -17,6 +19,19 @@ public class InventoryModel {
     int top = -1;
     String[][] stack = new String[10][7];
     ArrayList<String[]> inventoryList = new ArrayList<>();
+    
+    
+    private InventoryModel() {
+    }
+    
+   
+    public static InventoryModel getInstance() {
+        if (instance == null) {
+            instance = new InventoryModel();
+        }
+        return instance;
+    }
+
     
     public int getFront() {
         return front;

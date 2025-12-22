@@ -16,8 +16,9 @@ public class AdminPanelController {
     private AdminPanel view;
     
     public AdminPanelController(AdminPanel view) {
-        this.model = new InventoryModel();
         this.view = view;
+        this.model = InventoryModel.getInstance();
+        loadInventoryTable();
     }
     
     public void enqueue(String itemID, String itemName, String quantity, String costPrice, String price, String category) {
@@ -134,4 +135,17 @@ public class AdminPanelController {
             });
         }
     }
+    
+    public String[][] getQueue() {
+    return model.getQueue();
+}
+
+public int getFront() {
+    return model.getFront();
+}
+
+public int getRear() {
+    return model.getRear();
+}
+    
 }

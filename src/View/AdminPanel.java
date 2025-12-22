@@ -44,6 +44,7 @@ public class AdminPanel extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
+        jButton13 = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
@@ -86,15 +87,28 @@ public class AdminPanel extends javax.swing.JFrame {
 
         jPanel2.setBackground(new java.awt.Color(204, 102, 255));
 
+        jButton13.setText("Logout");
+        jButton13.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton13ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton13)
+                .addGap(58, 58, 58))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 63, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(23, Short.MAX_VALUE)
+                .addComponent(jButton13)
+                .addGap(17, 17, 17))
         );
 
         jPanel3.setBackground(new java.awt.Color(51, 204, 255));
@@ -451,6 +465,7 @@ public class AdminPanel extends javax.swing.JFrame {
         controller.enqueue(itemID, itemName, quantity, costPrice, price, category);
         controller.loadInventoryTable();
         
+        
         jTextField1.setText("");
         jTextField2.setText("");
         jTextField3.setText("");
@@ -458,6 +473,13 @@ public class AdminPanel extends javax.swing.JFrame {
         jTextField5.setText("");
         jTextField6.setText("");
     }//GEN-LAST:event_jButton9ActionPerformed
+
+    private void jButton13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton13ActionPerformed
+        LoginForm login = new LoginForm();
+    login.setVisible(true);
+
+    this.dispose();
+    }//GEN-LAST:event_jButton13ActionPerformed
 
     
     
@@ -491,6 +513,7 @@ public class AdminPanel extends javax.swing.JFrame {
     private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton11;
     private javax.swing.JButton jButton12;
+    private javax.swing.JButton jButton13;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
