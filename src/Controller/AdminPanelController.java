@@ -5,6 +5,7 @@
 package Controller;
 import Model.InventoryModel;
 import View.AdminPanel;
+import java.util.ArrayList;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JOptionPane;
 /**
@@ -14,6 +15,7 @@ import javax.swing.JOptionPane;
 public class AdminPanelController {
     private InventoryModel model;
     private AdminPanel view;
+    private int foundIndex = -1;
     
     public AdminPanelController(AdminPanel view) {
         this.view = view;
@@ -135,6 +137,127 @@ public class AdminPanelController {
             });
         }
     }
+    
+    
+    public int performBinarySearch(
+        String searchValue,
+        ArrayList<String[]> inventoryList,
+        int low,
+        int high) {
+
+    if (low > high) {
+        return -1;
+    }
+
+    int mid = low + (high - low) / 2;
+
+    String midItemName = inventoryList.get(mid)[1]; // ItemName
+
+    int comparison = searchValue.compareToIgnoreCase(midItemName);
+
+    if (comparison == 0) {
+        return mid;
+    } else if (comparison < 0) {
+        return performBinarySearch(searchValue, inventoryList, low, mid - 1);
+    } else {
+        return performBinarySearch(searchValue, inventoryList, mid + 1, high);
+    }
+}
+
+    
+    
+    public void searchItem(String itemName) {
+
+    ArrayList<String[]> list = model.getInventoryList();
+
+    if (list.isEmpty()) {
+        JOptionPane.showMessageDialog(view, "Inventory is empty");
+        return;
+    }
+
+    // Manual sort by ItemName (index 1)
+    for (int i = 0; i < list.size() - 1; i++) {
+        for (int j = 0; j < list.size() - i - 1; j++) {
+            if (list.get(j)[1]
+                    .compareToIgnoreCase(list.get(j + 1)[1]) > 0) {
+
+                String[] temp = list.get(j);
+                list.set(j, list.get(j + 1));
+                list.set(j + 1, temp);
+            }
+        }
+    }
+
+    foundIndex = performBinarySearch(itemName, list, 0, list.size() - 1);
+
+    if (foundIndex == -1) {
+        JOptionPane.showMessageDialog(view, "Item not found");
+        return;
+    }
+
+    String[] record = list.get(foundIndex);
+
+    // Fill fields
+    view.setItemFields(
+        record[0], record[1], record[2],
+        record[3], record[4], record[5]
+    );
+}
+
+
+    
+    public void updateItem(
+        String itemID,
+        String itemName,
+        String quantity,
+        String costPrice,
+        String price,
+        String category) {
+
+    if (foundIndex == -1) {
+        JOptionPane.showMessageDialog(view, "Search item before updating");
+        return;
+    }
+
+    ArrayList<String[]> list = model.getInventoryList();
+
+    double profitLoss;
+    try {
+        profitLoss = Double.parseDouble(price) - Double.parseDouble(costPrice);
+    } catch (NumberFormatException e) {
+        profitLoss = 0.0;
+    }
+
+    // Update inventory list
+    String[] record = list.get(foundIndex);
+    record[0] = itemID;
+    record[1] = itemName;
+    record[2] = quantity;
+    record[3] = costPrice;
+    record[4] = price;
+    record[5] = category;
+    record[6] = String.valueOf(profitLoss);
+
+    // Update queue (match by ItemID)
+    for (int i = model.getFront(); i <= model.getRear(); i++) {
+        if (model.getQueue()[i][0] != null &&
+            model.getQueue()[i][0].equals(itemID)) {
+
+            model.getQueue()[i] = record;
+            break;
+        }
+    }
+
+    loadInventoryTable();
+    JOptionPane.showMessageDialog(view, "Item updated successfully");
+
+    foundIndex = -1;
+}
+
+
+
+    
+    
     
     public String[][] getQueue() {
     return model.getQueue();

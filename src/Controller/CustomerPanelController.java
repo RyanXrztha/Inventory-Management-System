@@ -29,11 +29,11 @@ public class CustomerPanelController {
         for (int i = model.getFront(); i <= model.getRear(); i++) {
             if (model.getQueue()[i][0] != null) {
                 dtm.addRow(new Object[]{
-                    model.getQueue()[i][0], // ItemID
-                    model.getQueue()[i][1], // ItemName
-                    model.getQueue()[i][2], // Quantity
-                    model.getQueue()[i][4], // Price
-                    model.getQueue()[i][5]  // Category
+                    model.getQueue()[i][0],
+                    model.getQueue()[i][1],
+                    model.getQueue()[i][2],
+                    model.getQueue()[i][4],
+                    model.getQueue()[i][5]
                 });
             }
         }
