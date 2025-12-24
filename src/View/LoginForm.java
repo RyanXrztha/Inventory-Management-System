@@ -186,7 +186,7 @@ public class LoginForm extends javax.swing.JFrame {
     }//GEN-LAST:event_jPasswordField1ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-           Controller.LoginFormController.validateLogin(this);
+           Controller.LoginFormController.Login(this);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
@@ -233,7 +233,7 @@ public String getUserName(){
     return jTextField1.getText();
 }
 
-public String getUserPassword(){
+public String getPassword(){
     return String.valueOf(jPasswordField1.getPassword());
 }
 

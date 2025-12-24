@@ -12,42 +12,42 @@ import View.CustomerPanel;
  * @author aryan
  */
 public class LoginFormController {
-    public static void validateLogin(LoginForm view) {
+    public static void Login(LoginForm view) {
 
         String username = view.getUserName().trim();
-        String password = view.getUserPassword().trim();
+        String password = view.getPassword().trim();
 
         if (username.isEmpty() && password.isEmpty()) {
-            JOptionPane.showMessageDialog(view, "Username and Password cannot be empty!", 
-                "Empty Fields", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(view, "Please enter both username and password", 
+                "Both fields are not entered", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         if (username.isEmpty()) {
-            JOptionPane.showMessageDialog(view, "Username cannot be empty!", 
-                "Empty Username", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(view, "Please enter username", 
+                "Username is not entered", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         if (password.isEmpty()) {
-            JOptionPane.showMessageDialog(view, "Password cannot be empty!", 
-                "Empty Password", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(view, "Please enter password", 
+                "Password is not entered", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        if(username.equals("admin") && password.equals("admin")){
-            JOptionPane.showMessageDialog(view, "Admin Login Successful!", 
-                "Success", JOptionPane.INFORMATION_MESSAGE);
+        if(username.equalsIgnoreCase("admin") && password.equalsIgnoreCase("admin")){
+            JOptionPane.showMessageDialog(view, "Welcome Admin", 
+                "Login Sucessful", JOptionPane.INFORMATION_MESSAGE);
             AdminPanel admin = new AdminPanel();
             admin.setVisible(true);
-            view.dispose(); // ✅ Close login form
+            view.dispose();
         }
         else {
-            JOptionPane.showMessageDialog(view, "Customer Login Successful!", 
-                "Success", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(view, "Welcome to our store", 
+                "Login Sucessful", JOptionPane.INFORMATION_MESSAGE);
             CustomerPanel customer = new CustomerPanel();
             customer.setVisible(true);
-            view.dispose(); // ✅ Close login form
+            view.dispose();
         }
     }
 }

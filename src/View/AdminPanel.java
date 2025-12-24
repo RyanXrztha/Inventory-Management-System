@@ -25,7 +25,7 @@ public class AdminPanel extends javax.swing.JFrame {
         controller = new AdminPanelController(this);
     }
     
-    public void setItemFields(
+    public void setChangedFields(
         String itemID,
         String itemName,
         String quantity,
@@ -512,7 +512,7 @@ public class AdminPanel extends javax.swing.JFrame {
 
     private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
         controller.dequeue();
-        controller.loadInventoryTable();
+        controller.loadAdminPanelTable();
         controller.loadDeletedTable();
     }//GEN-LAST:event_jButton12ActionPerformed
 
@@ -525,7 +525,7 @@ public class AdminPanel extends javax.swing.JFrame {
         String category = jTextField6.getText();
         
         controller.enqueue(itemID, itemName, quantity, costPrice, price, category);
-        controller.loadInventoryTable();
+        controller.loadAdminPanelTable();
         
         
         jTextField1.setText("");

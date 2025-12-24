@@ -9,13 +9,13 @@ import java.util.ArrayList;
  * @author aryan
  */
 public class InventoryModel {
-    private static InventoryModel instance = null;
+    private static InventoryModel a = null;
     
     final int size = 10;
     int front = -1;
     int rear = -1;
     String[][] queue = new String[10][7];
-    final int StackMax = 10;
+    final int fullSize = 10;
     int top = -1;
     String[][] stack = new String[10][7];
     ArrayList<String[]> inventoryList = new ArrayList<>();
@@ -34,11 +34,11 @@ public class InventoryModel {
     }
     
    
-    public static InventoryModel getInstance() {
-        if (instance == null) {
-            instance = new InventoryModel();
+    public static InventoryModel geta() {
+        if (a == null) {
+            a = new InventoryModel();
         }
-        return instance;
+        return a;
     }
 
     
@@ -123,7 +123,7 @@ public class InventoryModel {
         return size;
     }
     
-    public int getStackMax() {
-        return StackMax;
+    public int getfullSize() {
+        return fullSize;
     }
 }

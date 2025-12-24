@@ -16,7 +16,7 @@ public class CustomerPanelController {
 
     public CustomerPanelController(CustomerPanel view) {
         this.view = view;
-        this.model = InventoryModel.getInstance(); 
+        this.model = InventoryModel.geta(); 
         loadCustomerTable();
     }
 

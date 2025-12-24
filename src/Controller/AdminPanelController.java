@@ -19,8 +19,8 @@ public class AdminPanelController {
     
     public AdminPanelController(AdminPanel view) {
         this.view = view;
-        this.model = InventoryModel.getInstance();
-        loadInventoryTable();
+        this.model = InventoryModel.geta();
+        loadAdminPanelTable();
     }
     
     public void enqueue(String itemID, String itemName, String quantity, String costPrice, String price, String category) {
@@ -28,6 +28,50 @@ public class AdminPanelController {
             JOptionPane.showMessageDialog(view, "Inventory queue is full!");
             return;
         }
+        
+        if(itemID.trim().isEmpty()){
+        JOptionPane.showMessageDialog(view, "Please enter itemID", 
+            "itemID is not entered", JOptionPane.WARNING_MESSAGE);
+        return;
+        }
+        
+        if(itemName.trim().isEmpty()){
+        JOptionPane.showMessageDialog(view, "Please enter itemName", 
+            "itemName is not entered", JOptionPane.WARNING_MESSAGE);
+        return;
+        }
+        
+        if(quantity.trim().isEmpty()){
+        JOptionPane.showMessageDialog(view, "Please enter quantity", 
+            "Quantity is not entered", JOptionPane.WARNING_MESSAGE);
+        return;
+        }
+        
+        if(costPrice.trim().isEmpty()){
+        JOptionPane.showMessageDialog(view, "Please enter costPrice", 
+            "Cost Price is not entered", JOptionPane.WARNING_MESSAGE);
+        return;
+        }
+        
+        if(price.trim().isEmpty()){
+        JOptionPane.showMessageDialog(view, "Please enter selling price", 
+            "Selling Price is not entered", JOptionPane.WARNING_MESSAGE);
+        return;
+        }
+        
+        if(category.trim().isEmpty()){
+        JOptionPane.showMessageDialog(view, "Please enter category", 
+            "Category is not entered", JOptionPane.WARNING_MESSAGE);
+        return;
+        }
+        
+         if(itemID.trim().isEmpty() || itemName.trim().isEmpty() || quantity.trim().isEmpty() || 
+       costPrice.trim().isEmpty() || price.trim().isEmpty() || category.trim().isEmpty()){
+        JOptionPane.showMessageDialog(view, "All fields are required! Please fill in all information.", 
+            "Empty Fields", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+        
         if(model.getFront() == -1){
             model.setFront(0);
         }
@@ -76,8 +120,8 @@ public class AdminPanelController {
             model.setFront(-1);
             model.setRear(-1);
         }
-        if(model.getTop() == model.getStackMax() - 1){
-            JOptionPane.showMessageDialog(view, "Deleted history is full");
+        if(model.getTop() == model.getfullSize() - 1){
+            JOptionPane.showMessageDialog(view, "Item deleted history has been full");
         } else {
             model.setTop(model.getTop() + 1);
             model.getStack()[model.getTop()][0] = itemID;
@@ -92,7 +136,7 @@ public class AdminPanelController {
     
     public void popFromStack() {
         if(model.getTop() == -1){
-            JOptionPane.showMessageDialog(view, "No records in deleted history!");
+            JOptionPane.showMessageDialog(view, "There is not item data in table");
             return;
         }
         String deletedName = model.getStack()[model.getTop()][1];
@@ -103,7 +147,7 @@ public class AdminPanelController {
         model.setTop(model.getTop() - 1);
     }
     
-    public void loadInventoryTable() {
+    public void loadAdminPanelTable() {
         DefaultTableModel tableModel = (DefaultTableModel) view.getjTable3().getModel();
         tableModel.setRowCount(0);
         if(model.getFront() == -1 || model.getFront() > model.getRear()) return;
@@ -175,7 +219,6 @@ public class AdminPanelController {
         return;
     }
 
-    // Manual sort by ItemName (index 1)
     for (int i = 0; i < list.size() - 1; i++) {
         for (int j = 0; j < list.size() - i - 1; j++) {
             if (list.get(j)[1]
@@ -191,14 +234,14 @@ public class AdminPanelController {
     foundIndex = performBinarySearch(itemName, list, 0, list.size() - 1);
 
     if (foundIndex == -1) {
-        JOptionPane.showMessageDialog(view, "Item not found");
+        JOptionPane.showMessageDialog(view, "Searched item is not available");
         return;
     }
 
     String[] record = list.get(foundIndex);
 
     // Fill fields
-    view.setItemFields(
+    view.setChangedFields(
         record[0], record[1], record[2],
         record[3], record[4], record[5]
     );
@@ -215,7 +258,7 @@ public class AdminPanelController {
         String category) {
 
     if (foundIndex == -1) {
-        JOptionPane.showMessageDialog(view, "Search item before updating");
+        JOptionPane.showMessageDialog(view, "Please search item name before updating values");
         return;
     }
 
@@ -238,7 +281,7 @@ public class AdminPanelController {
     record[5] = category;
     record[6] = String.valueOf(profitLoss);
 
-    // Update queue (match by ItemID)
+    
     for (int i = model.getFront(); i <= model.getRear(); i++) {
         if (model.getQueue()[i][0] != null &&
             model.getQueue()[i][0].equals(itemID)) {
@@ -248,8 +291,8 @@ public class AdminPanelController {
         }
     }
 
-    loadInventoryTable();
-    JOptionPane.showMessageDialog(view, "Item updated successfully");
+    loadAdminPanelTable();
+    JOptionPane.showMessageDialog(view, "Item has been updated");
 
     foundIndex = -1;
 }
