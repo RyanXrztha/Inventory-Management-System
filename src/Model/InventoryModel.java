@@ -21,6 +21,15 @@ public class InventoryModel {
     ArrayList<String[]> inventoryList = new ArrayList<>();
     
     
+    private String itemID;
+    private String itemName;
+    private int quantity;
+    private double costPrice;
+    private double price;
+    private String category;
+    private double profitLoss;
+    
+    
     private InventoryModel() {
     }
     
@@ -32,6 +41,47 @@ public class InventoryModel {
         return instance;
     }
 
+    
+
+    public InventoryModel(String itemID, String itemName, int quantity,
+                          double costPrice, double price, String category) {
+        this.itemID = itemID;
+        this.itemName = itemName;
+        this.quantity = quantity;
+        this.costPrice = costPrice;
+        this.price = price;
+        this.category = category;
+        this.profitLoss = price - costPrice;
+    }
+
+    public String getItemID() {
+        return itemID;
+    }
+    
+    public String getItemName() {
+        return itemName;
+    }
+    
+    public int getQuantity() { return quantity; }
+    public double getCostPrice() { return costPrice; }
+    public double getPrice() { return price; }
+    public String getCategory() { return category; }
+    public double getProfitLoss() { return profitLoss; }
+
+    
+    public void setItemName(String itemName) { this.itemName = itemName; }
+    public void setQuantity(int quantity) { this.quantity = quantity; }
+    public void setCostPrice(double costPrice) {
+        this.costPrice = costPrice;
+        this.profitLoss = this.price - costPrice;
+    }
+    public void setPrice(double price) {
+        this.price = price;
+        this.profitLoss = price - this.costPrice;
+    }
+    public void setCategory(String category) { this.category = category; }
+    
+    
     
     public int getFront() {
         return front;
