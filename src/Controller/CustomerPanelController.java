@@ -10,9 +10,9 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author aryan
  */
-public class CustomerPanelController {
-     private InventoryModel model;
-    private CustomerPanel view;
+public final class CustomerPanelController {
+    private final InventoryModel model;
+    private final CustomerPanel view;
 
     public CustomerPanelController(CustomerPanel view) {
         this.view = view;
@@ -21,14 +21,14 @@ public class CustomerPanelController {
     }
 
     public void loadCustomerTable() {
-        DefaultTableModel dtm = (DefaultTableModel) view.getjTable1().getModel();
-        dtm.setRowCount(0);
+        DefaultTableModel loadcust = (DefaultTableModel) view.getjTable1().getModel();
+        loadcust.setRowCount(0);
 
         if (model.getFront() == -1) return;
 
         for (int i = model.getFront(); i <= model.getRear(); i++) {
             if (model.getQueue()[i][0] != null) {
-                dtm.addRow(new Object[]{
+                loadcust.addRow(new Object[]{
                     model.getQueue()[i][0],
                     model.getQueue()[i][1],
                     model.getQueue()[i][2],

@@ -43,8 +43,7 @@ public class InventoryModel {
 
     
 
-    public InventoryModel(String itemID, String itemName, int quantity,
-                          double costPrice, double price, String category) {
+    public InventoryModel(String itemID, String itemName, int quantity, double costPrice, double price, String category) {
         this.itemID = itemID;
         this.itemName = itemName;
         this.quantity = quantity;
@@ -62,25 +61,25 @@ public class InventoryModel {
         return itemName;
     }
     
-    public int getQuantity() { return quantity; }
-    public double getCostPrice() { return costPrice; }
-    public double getPrice() { return price; }
-    public String getCategory() { return category; }
-    public double getProfitLoss() { return profitLoss; }
-
-    
-    public void setItemName(String itemName) { this.itemName = itemName; }
-    public void setQuantity(int quantity) { this.quantity = quantity; }
-    public void setCostPrice(double costPrice) {
-        this.costPrice = costPrice;
-        this.profitLoss = this.price - costPrice;
+    public int getQuantity() {
+        return quantity;
     }
-    public void setPrice(double price) {
-        this.price = price;
-        this.profitLoss = price - this.costPrice;
-    }
-    public void setCategory(String category) { this.category = category; }
     
+    public double getCostPrice() {
+        return costPrice;
+    }
+    
+    public double getPrice() {
+        return price;
+    }
+    
+    public String getCategory() {
+        return category;
+    }
+    
+    public double getProfitLoss() {
+        return profitLoss;
+    }
     
     
     public int getFront() {
@@ -103,10 +102,6 @@ public class InventoryModel {
         return top;
     }
     
-    public void setTop(int top) {
-        this.top = top;
-    }
-    
     public String[][] getQueue() {
         return queue;
     }
@@ -126,4 +121,35 @@ public class InventoryModel {
     public int getfullSize() {
         return fullSize;
     }
+    
+    
+
+    
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
+    }
+    
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+    
+    public void setCostPrice(double costPrice) {
+        this.costPrice = costPrice;
+        this.profitLoss = this.price - costPrice;
+    }
+    
+    public void setPrice(double price) {
+        this.price = price;
+        this.profitLoss = price - this.costPrice;
+    }
+    
+    public void setCategory(String category) {
+        this.category = category;
+    }
+    
+    public void setTop(int top) {
+        this.top = top;
+    }
+    
+    
 }

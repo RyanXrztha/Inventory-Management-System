@@ -229,12 +229,12 @@ public class LoginForm extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 
-public String getUserName(){
-    return jTextField1.getText();
-}
+    public String getUserName(){
+        return jTextField1.getText();
+    }
 
-public String getPassword(){
-    return String.valueOf(jPasswordField1.getPassword());
-}
+    public String getPassword(){
+        return String.valueOf(jPasswordField1.getPassword());
+    }
 
 }

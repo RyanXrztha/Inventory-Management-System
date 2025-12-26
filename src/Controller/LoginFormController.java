@@ -18,33 +18,28 @@ public class LoginFormController {
         String password = view.getPassword().trim();
 
         if (username.isEmpty() && password.isEmpty()) {
-            JOptionPane.showMessageDialog(view, "Please enter both username and password", 
-                "Both fields are not entered", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(view, "Please enter both username and password", "Both fields are not entered", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         if (username.isEmpty()) {
-            JOptionPane.showMessageDialog(view, "Please enter username", 
-                "Username is not entered", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(view, "Please enter username", "Username is not entered", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         if (password.isEmpty()) {
-            JOptionPane.showMessageDialog(view, "Please enter password", 
-                "Password is not entered", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(view, "Please enter password", "Password is not entered", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         if(username.equalsIgnoreCase("admin") && password.equalsIgnoreCase("admin")){
-            JOptionPane.showMessageDialog(view, "Welcome Admin", 
-                "Login Sucessful", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(view, "Welcome Admin", "Login Sucessful", JOptionPane.INFORMATION_MESSAGE);
             AdminPanel admin = new AdminPanel();
             admin.setVisible(true);
             view.dispose();
         }
         else {
-            JOptionPane.showMessageDialog(view, "Welcome to our store", 
-                "Login Sucessful", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(view, "Welcome to our store", "Login Sucessful", JOptionPane.INFORMATION_MESSAGE);
             CustomerPanel customer = new CustomerPanel();
             customer.setVisible(true);
             view.dispose();
