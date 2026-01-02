@@ -5,6 +5,7 @@
 package Controller;
 import Model.InventoryModel;
 import View.CustomerPanel;
+import java.util.ArrayList;
 import javax.swing.table.DefaultTableModel;
 /**
  *
@@ -23,19 +24,137 @@ public final class CustomerPanelController {
     public void loadCustomerTable() {
         DefaultTableModel loadcust = (DefaultTableModel) view.getjTable1().getModel();
         loadcust.setRowCount(0);
+        
+        ArrayList<String[]> list = model.getInventoryList();
+    
+        if(list.isEmpty()){
+            return;
+        }
 
-        if (model.getFront() == -1) return;
-
-        for (int i = model.getFront(); i <= model.getRear(); i++) {
-            if (model.getQueue()[i][0] != null) {
+        for(int i = 0; i < list.size(); i++){
+            if(list.get(i)[0] != null){
                 loadcust.addRow(new Object[]{
-                    model.getQueue()[i][0],
-                    model.getQueue()[i][1],
-                    model.getQueue()[i][2],
-                    model.getQueue()[i][4],
-                    model.getQueue()[i][5]
+                    list.get(i)[0],  // ItemID
+                    list.get(i)[1],  // ItemName
+                    list.get(i)[2],  // Quantity
+                    list.get(i)[4],  // Price
+                    list.get(i)[5],  // Category
                 });
             }
         }
     }
+    
+    public void sortByID() {
+    ArrayList<String[]> list = model.getInventoryList();
+    int size = list.size();
+    
+    for(int step = 0; step < size-1; step++){
+        int min_idx = step;
+        for(int i = step+1; i < size; i++){
+            if(list.get(i)[0].compareToIgnoreCase(list.get(min_idx)[0]) < 0){
+                min_idx = i;
+            }
+        }
+        String[] temp = list.get(step);
+        list.set(step, list.get(min_idx));
+        list.set(min_idx, temp);
+    }
+    loadCustomerTable();
+}
+
+// Sort by ItemName
+public void sortByName() {
+    ArrayList<String[]> list = model.getInventoryList();
+    int size = list.size();
+    
+    for(int step = 0; step < size-1; step++){
+        int min_idx = step;
+        for(int i = step+1; i < size; i++){
+            String name = list.get(i)[1];
+            if(name.compareToIgnoreCase(list.get(min_idx)[1]) < 0){
+                min_idx = i;
+            }
+        }
+        String[] temp = list.get(step);
+        list.set(step, list.get(min_idx));
+        list.set(min_idx, temp);
+    }
+    loadCustomerTable();
+}
+
+// Sort by Quantity
+public void sortByQuantity() {
+    ArrayList<String[]> list = model.getInventoryList();
+    int size = list.size();
+    
+    for(int step = 0; step < size-1; step++){
+        int min_idx = step;
+        for(int i = step+1; i < size; i++){
+            if(Integer.parseInt(list.get(i)[2]) < Integer.parseInt(list.get(min_idx)[2])){
+                min_idx = i;
+            }
+        }
+        String[] temp = list.get(step);
+        list.set(step, list.get(min_idx));
+        list.set(min_idx, temp);
+    }
+    loadCustomerTable();
+}
+
+// Sort by CostPrice
+public void sortByCostPrice() {
+    ArrayList<String[]> list = model.getInventoryList();
+    int size = list.size();
+    
+    for(int step = 0; step < size-1; step++){
+        int min_idx = step;
+        for(int i = step+1; i < size; i++){
+            if(Double.parseDouble(list.get(i)[3]) < Double.parseDouble(list.get(min_idx)[3])){
+                min_idx = i;
+            }
+        }
+        String[] temp = list.get(step);
+        list.set(step, list.get(min_idx));
+        list.set(min_idx, temp);
+    }
+    loadCustomerTable();
+}
+
+// Sort by Selling Price
+public void sortBySellingPrice() {
+    ArrayList<String[]> list = model.getInventoryList();
+    int size = list.size();
+    
+    for(int step = 0; step < size-1; step++){
+        int min_idx = step;
+        for(int i = step+1; i < size; i++){
+            if(Double.parseDouble(list.get(i)[4]) < Double.parseDouble(list.get(min_idx)[4])){
+                min_idx = i;
+            }
+        }
+        String[] temp = list.get(step);
+        list.set(step, list.get(min_idx));
+        list.set(min_idx, temp);
+    }
+    loadCustomerTable();
+}
+
+// Sort by Profit/Loss
+public void sortByProfitLoss() {
+    ArrayList<String[]> list = model.getInventoryList();
+    int size = list.size();
+    
+    for(int step = 0; step < size-1; step++){
+        int min_idx = step;
+        for(int i = step+1; i < size; i++){
+            if(Double.parseDouble(list.get(i)[6]) < Double.parseDouble(list.get(min_idx)[6])){
+                min_idx = i;
+            }
+        }
+        String[] temp = list.get(step);
+        list.set(step, list.get(min_idx));
+        list.set(min_idx, temp);
+    }
+    loadCustomerTable();
+}
 }

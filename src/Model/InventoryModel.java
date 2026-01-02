@@ -12,12 +12,13 @@ public class InventoryModel {
     private static InventoryModel a = null;
     
     final int size = 10;
-    int front = -1;
-    int rear = -1;
-    String[][] queue = new String[10][7];
-    final int fullSize = 10;
     int top = -1;
     String[][] stack = new String[10][7];
+    
+    final int fullSize = 10;
+    int deletedTop = -1;
+    String[][] deletedStack = new String[10][7];
+    
     ArrayList<String[]> inventoryList = new ArrayList<>();
     
     
@@ -71,7 +72,7 @@ public class InventoryModel {
     
     public double getPrice() {
         return price;
-    }
+    }   
     
     public String getCategory() {
         return category;
@@ -81,33 +82,20 @@ public class InventoryModel {
         return profitLoss;
     }
     
-    
-    public int getFront() {
-        return front;
-    }
-    
-    public void setFront(int front) {
-        this.front = front;
-    }
-    
-    public int getRear() {
-        return rear;
-    }
-    
-    public void setRear(int rear) {
-        this.rear = rear;
-    }
-    
     public int getTop() {
         return top;
     }
     
-    public String[][] getQueue() {
-        return queue;
+    public int getDeletedTop() {
+        return deletedTop;
     }
     
     public String[][] getStack() {
         return stack;
+    }
+    
+    public String[][] getDeletedStack() {
+        return deletedStack;
     }
     
     public ArrayList<String[]> getInventoryList() {
@@ -122,8 +110,13 @@ public class InventoryModel {
         return fullSize;
     }
     
+    public void setTop(int top) {
+        this.top = top;
+    }
     
-
+    public void setDeletedTop(int deletedTop) {
+        this.deletedTop = deletedTop;
+    }
     
     public void setItemName(String itemName) {
         this.itemName = itemName;
@@ -146,10 +139,4 @@ public class InventoryModel {
     public void setCategory(String category) {
         this.category = category;
     }
-    
-    public void setTop(int top) {
-        this.top = top;
-    }
-    
-    
 }
