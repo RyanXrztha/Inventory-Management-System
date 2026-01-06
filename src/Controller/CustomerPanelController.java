@@ -6,6 +6,7 @@ package Controller;
 import Model.InventoryModel;
 import View.CustomerPanel;
 import java.util.ArrayList;
+import java.util.Queue;
 import javax.swing.table.DefaultTableModel;
 /**
  *
@@ -22,7 +23,7 @@ public final class CustomerPanelController {
     }
 
     public void loadCustomerTable() {
-        DefaultTableModel loadcust = (DefaultTableModel) view.getjTable1().getModel();
+        DefaultTableModel loadcust = (DefaultTableModel) view.getjTable2().getModel();
         loadcust.setRowCount(0);
         
         ArrayList<String[]> list = model.getInventoryList();
@@ -41,6 +42,28 @@ public final class CustomerPanelController {
                     list.get(i)[5],  // Category
                 });
             }
+        }
+    }
+    
+    public void loadRecentItemsTable() {
+        DefaultTableModel tableModel = (DefaultTableModel) view.getjTable1().getModel();
+        tableModel.setRowCount(0);
+        
+        Queue<String[]> recentQueue = model.getRecentItemsQueue();
+        
+        if(recentQueue.isEmpty()){
+            return;
+        }
+        
+        // Convert queue to array to display (without removing from queue)
+        for(String[] item : recentQueue) {
+            tableModel.addRow(new Object[]{
+                item[0],  // ItemID
+                item[1],  // ItemName
+                item[2],  // Quantity
+                item[4],  // Price (not costPrice)
+                item[5]   // Category
+            });
         }
     }
     
@@ -101,24 +124,7 @@ public void sortByQuantity() {
     loadCustomerTable();
 }
 
-// Sort by CostPrice
-public void sortByCostPrice() {
-    ArrayList<String[]> list = model.getInventoryList();
-    int size = list.size();
-    
-    for(int step = 0; step < size-1; step++){
-        int min_idx = step;
-        for(int i = step+1; i < size; i++){
-            if(Double.parseDouble(list.get(i)[3]) < Double.parseDouble(list.get(min_idx)[3])){
-                min_idx = i;
-            }
-        }
-        String[] temp = list.get(step);
-        list.set(step, list.get(min_idx));
-        list.set(min_idx, temp);
-    }
-    loadCustomerTable();
-}
+
 
 // Sort by Selling Price
 public void sortBySellingPrice() {

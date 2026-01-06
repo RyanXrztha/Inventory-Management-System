@@ -4,6 +4,8 @@
  */
 package Model;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 /**
  *
  * @author aryan
@@ -20,6 +22,9 @@ public class InventoryModel {
     String[][] deletedStack = new String[10][7];
     
     ArrayList<String[]> inventoryList = new ArrayList<>();
+    
+    private Queue<String[]> recentItemsQueue = new LinkedList<>();
+    private final int MAX_RECENT_ITEMS = 5;
     
     
     private String itemID;
@@ -41,7 +46,19 @@ public class InventoryModel {
         }
         return a;
     }
+    
 
+    public Queue<String[]> getRecentItemsQueue() {
+        return recentItemsQueue;
+    }
+    
+    public void addToRecentQueue(String[] item) {
+        // If queue is full, remove oldest item (FIFO)
+        if (recentItemsQueue.size() >= MAX_RECENT_ITEMS) {
+            recentItemsQueue.poll();  // Remove first (oldest)
+        }
+        recentItemsQueue.offer(item);  // Add to end (newest)
+    }
     
 
     public InventoryModel(String itemID, String itemName, int quantity, double costPrice, double price, String category) {
