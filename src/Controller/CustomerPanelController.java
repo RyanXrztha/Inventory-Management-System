@@ -50,20 +50,29 @@ public final class CustomerPanelController {
         DefaultTableModel tableModel = (DefaultTableModel) view.getjTable1().getModel();
         tableModel.setRowCount(0);
         
-        Queue<String[]> recentQueue = model.getRecentItemsQueue();
+        String[][] queue = model.getRecentItemsQueue();
+        int front = model.getQueueFront();
+        int rear = model.getQueueRear();
+        int maxSize = model.getMaxRecentItems();
         
-        if(recentQueue.isEmpty()){
-            return;
-        }
-        
-        for(String[] item : recentQueue) {
-            tableModel.addRow(new Object[]{
-                item[0],
-                item[1],
-                item[2],
-                item[4],
-                item[5]
-            });
+        // Manual circular queue traversal
+        int i = front;
+        while(true) {
+            if(queue[i] != null) {
+                tableModel.addRow(new Object[]{
+                    queue[i][0],  // ItemID
+                    queue[i][1],  // ItemName
+                    queue[i][2],  // Quantity
+                    queue[i][4],  // Price
+                    queue[i][5]   // Category
+                });
+            }
+            
+            if(i == rear) {
+                break;
+            }
+            
+            i = (i + 1) % maxSize;  // Circular increment
         }
     }
     
@@ -282,64 +291,88 @@ public final class CustomerPanelController {
     }
 
     public void searchRecentItemFromID(String itemID) {
-        Queue<String[]> recentQueue = model.getRecentItemsQueue();
-        if (recentQueue.isEmpty()) {
+        if(model.isRecentQueueEmpty()) {
             JOptionPane.showMessageDialog(view, "Recent items list is empty");
             return;
         }
-
-        // Linear search in queue
+        
+        String[][] queue = model.getRecentItemsQueue();
+        int front = model.getQueueFront();
+        int rear = model.getQueueRear();
+        int maxSize = model.getMaxRecentItems();
+        
         String[] foundItem = null;
-        for (String[] item : recentQueue) {
-            if (item[0].equalsIgnoreCase(itemID)) {
-                foundItem = item;
+        
+        // Manual circular queue search
+        int i = front;
+        while(true) {
+            if(queue[i] != null && queue[i][0].equalsIgnoreCase(itemID)) {
+                foundItem = queue[i];
                 break;
             }
+            
+            if(i == rear) {
+                break;
+            }
+            
+            i = (i + 1) % maxSize;
         }
-
+        
         if (foundItem == null) {
             JOptionPane.showMessageDialog(view, "No recent item found with ID: " + itemID);
             return;
         }
-
+        
         String message = "Recent Item Found!\n\n" +
                         "Item ID: " + foundItem[0] + "\n" +
                         "Item Name: " + foundItem[1] + "\n" +
                         "Quantity: " + foundItem[2] + "\n" +
                         "Price: " + foundItem[4] + "\n" +
                         "Category: " + foundItem[5];
-
+        
         JOptionPane.showMessageDialog(view, message, "Search Result", JOptionPane.INFORMATION_MESSAGE);
     }
 
     public void searchRecentItemFromName(String itemName) {
-        Queue<String[]> recentQueue = model.getRecentItemsQueue();
-        if (recentQueue.isEmpty()) {
+        if(model.isRecentQueueEmpty()) {
             JOptionPane.showMessageDialog(view, "Recent items list is empty");
             return;
         }
-
-        // Linear search with partial matching in queue
+        
+        String[][] queue = model.getRecentItemsQueue();
+        int front = model.getQueueFront();
+        int rear = model.getQueueRear();
+        int maxSize = model.getMaxRecentItems();
+        
         String[] foundItem = null;
-        for (String[] item : recentQueue) {
-            if (item[1].toLowerCase().contains(itemName.toLowerCase())) {
-                foundItem = item;
+        
+        // Manual circular queue search
+        int i = front;
+        while(true) {
+            if(queue[i] != null && queue[i][1].toLowerCase().contains(itemName.toLowerCase())) {
+                foundItem = queue[i];
                 break;
             }
+            
+            if(i == rear) {
+                break;
+            }
+            
+            i = (i + 1) % maxSize;
         }
-
+        
         if (foundItem == null) {
             JOptionPane.showMessageDialog(view, "No recent item found matching: " + itemName);
             return;
         }
-
+        
         String message = "Recent Item Found!\n\n" +
                         "Item ID: " + foundItem[0] + "\n" +
                         "Item Name: " + foundItem[1] + "\n" +
                         "Quantity: " + foundItem[2] + "\n" +
                         "Price: " + foundItem[4] + "\n" +
                         "Category: " + foundItem[5];
-
+        
         JOptionPane.showMessageDialog(view, message, "Search Result", JOptionPane.INFORMATION_MESSAGE);
     }
 

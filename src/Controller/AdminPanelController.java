@@ -33,7 +33,7 @@ public final class AdminPanelController {
     
         push("1", "Bottle", "27", "105", "170", "Hydration Product");
         push("2", "Pencil", "100", "5", "10", "Stationery");
-        push("3", "Pen", "50", "40", "100", "Stationery");
+        push("3", "Copy", "50", "40", "100", "Stationery");
         push("4", "Bulb", "60", "200", "500", "Electronics");
         push("5", "Study Table", "80", "800", "1800", "Furniture");
     
@@ -179,17 +179,7 @@ public final class AdminPanelController {
             }
         }
         
-        Queue<String[]> recentQueue = model.getRecentItemsQueue();
-        Queue<String[]> tempQueue = new java.util.LinkedList<>();
-        for(String[] item : recentQueue) {
-            if(!item[0].equals(itemID)) {
-                tempQueue.add(item);
-            }
-        }
-        recentQueue.clear();
-        for(String[] item : tempQueue) {
-            recentQueue.add(item);
-        }
+        model.removeFromRecentQueue(itemID);
         
         if(model.getDeletedTop() == model.getfullSize() - 1){
             JOptionPane.showMessageDialog(view, "Item deleted history is full");
@@ -206,6 +196,66 @@ public final class AdminPanelController {
     }
     
 
+    public void recoverItem() {
+        if(model.getDeletedTop() == -1){
+            JOptionPane.showMessageDialog(view, "No items in deleted history to recover");
+            return;
+        }
+
+        // Get the most recently deleted item (from top of deleted stack)
+        String itemID = model.getDeletedStack()[model.getDeletedTop()][0];
+        String itemName = model.getDeletedStack()[model.getDeletedTop()][1];
+        String quantity = model.getDeletedStack()[model.getDeletedTop()][2];
+        String costPrice = model.getDeletedStack()[model.getDeletedTop()][3];
+        String price = model.getDeletedStack()[model.getDeletedTop()][4];
+        String category = model.getDeletedStack()[model.getDeletedTop()][5];
+        String profitLoss = model.getDeletedStack()[model.getDeletedTop()][6];
+
+        // Check if item ID already exists in current inventory
+        if (isDuplicateItemID(itemID)) {
+            JOptionPane.showMessageDialog(view, 
+                "Cannot recover: Item with ID '" + itemID + "' already exists in inventory!", 
+                "Duplicate Item ID", 
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Check if main stack has space
+        if(model.getTop() == model.getSize() - 1){
+            JOptionPane.showMessageDialog(view, "Inventory stack is full. Cannot recover item.");
+            return;
+        }
+
+        // Add to main stack
+        model.setTop(model.getTop() + 1);
+        model.getStack()[model.getTop()][0] = itemID;
+        model.getStack()[model.getTop()][1] = itemName;
+        model.getStack()[model.getTop()][2] = quantity;
+        model.getStack()[model.getTop()][3] = costPrice;
+        model.getStack()[model.getTop()][4] = price;
+        model.getStack()[model.getTop()][5] = category;
+        model.getStack()[model.getTop()][6] = profitLoss;
+
+        // Add to inventory list
+        String[] record = {itemID, itemName, quantity, costPrice, price, category, profitLoss};
+        model.getInventoryList().add(record);
+
+        // Add to recent items queue
+        model.addToRecentQueue(record);
+
+        // Remove from deleted stack
+        for(int j = 0; j < 7; j++){
+            model.getDeletedStack()[model.getDeletedTop()][j] = null;
+        }
+        model.setDeletedTop(model.getDeletedTop() - 1);
+
+        JOptionPane.showMessageDialog(view, "Item '" + itemName + "' has been recovered successfully!");
+
+        // Refresh both tables
+        loadAdminPanelTable();
+        loadDeletedTable();
+    }
+    
     
     public void popFromDeletedStack() {
         if(model.getDeletedTop() == -1){

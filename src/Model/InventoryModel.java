@@ -23,8 +23,10 @@ public class InventoryModel {
     
     ArrayList<String[]> inventoryList = new ArrayList<>();
     
-    private Queue<String[]> recentItemsQueue = new LinkedList<>();
     private final int MAX_RECENT_ITEMS = 5;
+    private String[][] recentItemsQueue = new String[MAX_RECENT_ITEMS][7];
+    private int front = -1;
+    private int rear = -1;
     
     
     private String itemID;
@@ -48,16 +50,115 @@ public class InventoryModel {
     }
     
 
-    public Queue<String[]> getRecentItemsQueue() {
+    public void addToRecentQueue(String[] item) {
+        // If queue is full, dequeue (remove oldest)
+        if ((rear == MAX_RECENT_ITEMS - 1 && front == 0) || (rear + 1 == front)) {
+            // Queue is full, remove front element
+            if (front == rear) {
+                // Only one element
+                front = -1;
+                rear = -1;
+            } else if (front == MAX_RECENT_ITEMS - 1) {
+                front = 0; // Wrap around
+            } else {
+                front++;
+            }
+        }
+        
+        // Enqueue the new item
+        if (front == -1) {
+            // Queue is empty
+            front = 0;
+            rear = 0;
+        } else if (rear == MAX_RECENT_ITEMS - 1) {
+            // Wrap around
+            rear = 0;
+        } else {
+            rear++;
+        }
+        
+        // Copy item data to queue
+        recentItemsQueue[rear] = new String[7];
+        for (int i = 0; i < 7; i++) {
+            recentItemsQueue[rear][i] = item[i];
+        }
+    }
+    
+    // ✅ GET QUEUE SIZE (MANUAL)
+    public int getRecentQueueSize() {
+        if (front == -1) {
+            return 0;
+        }
+        
+        if (rear >= front) {
+            return rear - front + 1;
+        } else {
+            return (MAX_RECENT_ITEMS - front) + rear + 1;
+        }
+    }
+    
+    // ✅ CHECK IF QUEUE IS EMPTY
+    public boolean isRecentQueueEmpty() {
+        return front == -1;
+    }
+    
+    // ✅ GET QUEUE ARRAY (for traversal)
+    public String[][] getRecentItemsQueue() {
         return recentItemsQueue;
     }
     
-    public void addToRecentQueue(String[] item) {
-        // If queue is full, remove oldest item (FIFO)
-        if (recentItemsQueue.size() >= MAX_RECENT_ITEMS) {
-            recentItemsQueue.poll();  // Remove first (oldest)
+    public int getQueueFront() {
+        return front;
+    }
+    
+    public int getQueueRear() {
+        return rear;
+    }
+    
+    public int getMaxRecentItems() {
+        return MAX_RECENT_ITEMS;
+    }
+    
+    // ✅ REMOVE ITEM FROM QUEUE (MANUAL)
+    public void removeFromRecentQueue(String itemID) {
+        if (front == -1) {
+            return; // Queue is empty
         }
-        recentItemsQueue.offer(item);  // Add to end (newest)
+        
+        // Create temporary queue to rebuild without the item
+        String[][] tempQueue = new String[MAX_RECENT_ITEMS][7];
+        int tempFront = -1;
+        int tempRear = -1;
+        
+        // Traverse original queue
+        int i = front;
+        while (true) {
+            if (recentItemsQueue[i] != null && !recentItemsQueue[i][0].equals(itemID)) {
+                // Add to temp queue
+                if (tempFront == -1) {
+                    tempFront = 0;
+                    tempRear = 0;
+                } else {
+                    tempRear++;
+                }
+                
+                tempQueue[tempRear] = new String[7];
+                for (int j = 0; j < 7; j++) {
+                    tempQueue[tempRear][j] = recentItemsQueue[i][j];
+                }
+            }
+            
+            if (i == rear) {
+                break;
+            }
+            
+            i = (i + 1) % MAX_RECENT_ITEMS;
+        }
+        
+        // Copy temp back to original
+        recentItemsQueue = tempQueue;
+        front = tempFront;
+        rear = tempRear;
     }
     
 

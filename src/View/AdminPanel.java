@@ -89,6 +89,7 @@ public class AdminPanel extends javax.swing.JFrame {
         jTextField9 = new javax.swing.JTextField();
         jComboBox3 = new javax.swing.JComboBox<>();
         jButton17 = new javax.swing.JButton();
+        jButton18 = new javax.swing.JButton();
         jPanel6 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTable3 = new javax.swing.JTable();
@@ -376,6 +377,13 @@ public class AdminPanel extends javax.swing.JFrame {
             }
         });
 
+        jButton18.setText("Recover");
+        jButton18.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton18ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
         jPanel7Layout.setHorizontalGroup(
@@ -389,7 +397,10 @@ public class AdminPanel extends javax.swing.JFrame {
                         .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(jButton17))
-                    .addComponent(jButton8)
+                    .addGroup(jPanel7Layout.createSequentialGroup()
+                        .addComponent(jButton18)
+                        .addGap(62, 62, 62)
+                        .addComponent(jButton8))
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 730, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(58, Short.MAX_VALUE))
         );
@@ -404,7 +415,9 @@ public class AdminPanel extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jButton8)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton8)
+                    .addComponent(jButton18))
                 .addGap(17, 17, 17))
         );
 
@@ -772,6 +785,10 @@ public class AdminPanel extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton17ActionPerformed
 
+    private void jButton18ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton18ActionPerformed
+        controller.recoverItem();
+    }//GEN-LAST:event_jButton18ActionPerformed
+
     
     
     /**
@@ -809,6 +826,7 @@ public class AdminPanel extends javax.swing.JFrame {
     private javax.swing.JButton jButton15;
     private javax.swing.JButton jButton16;
     private javax.swing.JButton jButton17;
+    private javax.swing.JButton jButton18;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
