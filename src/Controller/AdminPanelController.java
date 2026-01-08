@@ -6,6 +6,7 @@ package Controller;
 import Model.InventoryModel;
 import View.AdminPanel;
 import java.util.ArrayList;
+import java.util.Queue;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JOptionPane;
 /**
@@ -40,7 +41,6 @@ public final class AdminPanelController {
 }
     
     public void push(String itemID, String itemName, String quantity, String costPrice, String price, String category) {
-        // Check if stack is full
         if(model.getTop() == model.getSize() - 1){
             JOptionPane.showMessageDialog(view, "Inventory stack is full");
             return;
@@ -132,7 +132,6 @@ public final class AdminPanelController {
             profitLoss = 0.0;
         }
         
-        // Push to stack (increment top)
         model.setTop(model.getTop() + 1);
         
         model.getStack()[model.getTop()][0] = itemID;
@@ -167,15 +166,12 @@ public final class AdminPanelController {
         
         JOptionPane.showMessageDialog(view, "Deleted: " + itemName);
         
-        // Clear the top position (no shifting needed in LIFO!)
         for(int j = 0; j < 7; j++){
             model.getStack()[model.getTop()][j] = null;
         }
         
-        // Decrement top
         model.setTop(model.getTop() - 1);
         
-        // Remove from inventory list
         for(int i = 0; i < model.getInventoryList().size(); i++){
             if(model.getInventoryList().get(i)[0].equals(itemID)){
                 model.getInventoryList().remove(i);
@@ -183,7 +179,18 @@ public final class AdminPanelController {
             }
         }
         
-        // Push to deleted stack
+        Queue<String[]> recentQueue = model.getRecentItemsQueue();
+        Queue<String[]> tempQueue = new java.util.LinkedList<>();
+        for(String[] item : recentQueue) {
+            if(!item[0].equals(itemID)) {
+                tempQueue.add(item);
+            }
+        }
+        recentQueue.clear();
+        for(String[] item : tempQueue) {
+            recentQueue.add(item);
+        }
+        
         if(model.getDeletedTop() == model.getfullSize() - 1){
             JOptionPane.showMessageDialog(view, "Item deleted history is full");
         } else {
@@ -197,6 +204,8 @@ public final class AdminPanelController {
             model.getDeletedStack()[model.getDeletedTop()][6] = profitLoss;
         }
     }
+    
+
     
     public void popFromDeletedStack() {
         if(model.getDeletedTop() == -1){
@@ -276,59 +285,68 @@ public final class AdminPanelController {
     
     public int searchID(String searchValue, ArrayList<String[]> inventoryList, int low, int high) {
 
-    if (low > high) {
-        return -1;
+        if (low > high) {
+            return -1;
+        }
+
+        int mid = low + (high - low) / 2;
+
+        String midItemID = inventoryList.get(mid)[0];
+
+        int comparison = searchValue.compareToIgnoreCase(midItemID);
+
+        if (comparison == 0) {
+            return mid;
+        } else if (comparison < 0) {
+            return searchID(searchValue, inventoryList, low, mid - 1);
+        } else {
+            return searchID(searchValue, inventoryList, mid + 1, high);
+        }
     }
-
-    int mid = low + (high - low) / 2;
-
-    String midItemID = inventoryList.get(mid)[0];  // Changed [1] to [0]
-
-    int comparison = searchValue.compareToIgnoreCase(midItemID);
-
-    if (comparison == 0) {
-        return mid;
-    } else if (comparison < 0) {
-        return searchID(searchValue, inventoryList, low, mid - 1);  // Changed method name
-    } else {
-        return searchID(searchValue, inventoryList, mid + 1, high);  // Changed method name
-    }
-}
 
     
     
     public void searchItemFromID(String itemID) {
 
-    ArrayList<String[]> list = model.getInventoryList();
+        ArrayList<String[]> list = model.getInventoryList();
 
-    if (list.isEmpty()) {
-        JOptionPane.showMessageDialog(view, "Inventory is empty");
-        return;
-    }
+        if (list.isEmpty()) {
+            JOptionPane.showMessageDialog(view, "Inventory is empty");
+            return;
+        }
 
-    // Sort by Item ID instead of Item Name
-    for (int i = 0; i < list.size() - 1; i++) {
-        for (int j = 0; j < list.size() - i - 1; j++) {
-            if (list.get(j)[0].compareToIgnoreCase(list.get(j + 1)[0]) > 0) {  // Changed [1] to [0]
+        // Sort by Item ID instead of Item Name
+        for (int i = 0; i < list.size() - 1; i++) {
+            for (int j = 0; j < list.size() - i - 1; j++) {
+                if (list.get(j)[0].compareToIgnoreCase(list.get(j + 1)[0]) > 0) {  // Changed [1] to [0]
 
-                String[] temp = list.get(j);
-                list.set(j, list.get(j + 1));
-                list.set(j + 1, temp);
+                    String[] temp = list.get(j);
+                    list.set(j, list.get(j + 1));
+                    list.set(j + 1, temp);
+                }
             }
         }
+
+        foundIndex = searchID(itemID, list, 0, list.size() - 1);  // Changed method call
+
+        if (foundIndex == -1) {
+            JOptionPane.showMessageDialog(view, "Searched item is not available");
+            return;
+        }
+
+        String[] record = list.get(foundIndex);
+        String message = "Item Found!\n\n" +
+                        "Item ID: " + record[0] + "\n" +
+                        "Item Name: " + record[1] + "\n" +
+                        "Quantity: " + record[2] + "\n" +
+                        "Cost Price: " + record[3] + "\n" +
+                        "Selling Price: " + record[4] + "\n" +
+                        "Category: " + record[5] + "\n" +
+                        "Profit/Loss: " + record[6];
+
+        JOptionPane.showMessageDialog(view, message, "Search Result", JOptionPane.INFORMATION_MESSAGE);
+        view.setChangedFields(record[0], record[1], record[2], record[3], record[4], record[5]);
     }
-
-    foundIndex = searchID(itemID, list, 0, list.size() - 1);  // Changed method call
-
-    if (foundIndex == -1) {
-        JOptionPane.showMessageDialog(view, "Searched item is not available");
-        return;
-    }
-
-    String[] record = list.get(foundIndex);
-
-    view.setChangedFields(record[0], record[1], record[2], record[3], record[4], record[5]);
-}
 
 
     
@@ -389,19 +407,18 @@ public final class AdminPanelController {
         for(int i = 0; i < list.size(); i++){
             if(list.get(i)[0] != null){
                 tableModel.addRow(new Object[]{
-                    list.get(i)[0],  // ItemID
-                    list.get(i)[1],  // ItemName
-                    list.get(i)[2],  // Quantity
-                    list.get(i)[3],  // CostPrice
-                    list.get(i)[4],  // Price
-                    list.get(i)[5],  // Category
-                    list.get(i)[6]   // Profit/Loss
+                    list.get(i)[0],
+                    list.get(i)[1],
+                    list.get(i)[2],
+                    list.get(i)[3],
+                    list.get(i)[4],
+                    list.get(i)[5],
+                    list.get(i)[6]
                 });
             }
         }
-}
-    
-    // Sort by ItemID
+    }
+
     public void sortByID() {
         ArrayList<String[]> list = model.getInventoryList();
         int size = list.size();
@@ -420,27 +437,25 @@ public final class AdminPanelController {
         loadSortingTable();
     }
 
-    // Sort by ItemName
     public void sortByName() {
         ArrayList<String[]> list = model.getInventoryList();
         int size = list.size();
 
-        for(int step = 0; step < size-1; step++){
-            int min_idx = step;
-            for(int i = step+1; i < size; i++){
-                String name = list.get(i)[1];
-                if(name.compareToIgnoreCase(list.get(min_idx)[1]) < 0){
-                    min_idx = i;
-                }
+        for (int step = 1; step < size; step++) {
+            String[] key = list.get(step);
+            int j = step - 1;
+
+            while (j >= 0 && list.get(j)[1].compareToIgnoreCase(key[1]) > 0) {
+                list.set(j + 1, list.get(j));
+                j = j - 1;
             }
-            String[] temp = list.get(step);
-            list.set(step, list.get(min_idx));
-            list.set(min_idx, temp);
+
+            list.set(j + 1, key);
         }
+
         loadSortingTable();
     }
 
-    // Sort by Quantity
     public void sortByQuantity() {
         ArrayList<String[]> list = model.getInventoryList();
         int size = list.size();
@@ -459,7 +474,6 @@ public final class AdminPanelController {
         loadSortingTable();
     }
 
-    // Sort by CostPrice
     public void sortByCostPrice() {
         ArrayList<String[]> list = model.getInventoryList();
         int size = list.size();
@@ -478,96 +492,202 @@ public final class AdminPanelController {
         loadSortingTable();
     }
 
-    // Sort by Selling Price
+    private void mergeSort(ArrayList<String[]> list, int left, int right, int columnIndex) {
+        if (left < right) {
+
+            int mid = left + (right - left) / 2;
+
+            mergeSort(list, left, mid, columnIndex);
+
+            mergeSort(list, mid + 1, right, columnIndex);
+
+            merge(list, left, mid, right, columnIndex);
+        }
+    }
+
+    private void merge(ArrayList<String[]> list, int left, int mid, int right, int columnIndex) {
+
+        int n1 = mid - left + 1;
+        int n2 = right - mid;
+
+        ArrayList<String[]> leftArray = new ArrayList<>();
+        ArrayList<String[]> rightArray = new ArrayList<>();
+
+        for (int i = 0; i < n1; i++) {
+            leftArray.add(list.get(left + i));
+        }
+        for (int j = 0; j < n2; j++) {
+            rightArray.add(list.get(mid + 1 + j));
+        }
+
+        int i = 0, j = 0;
+        int k = left;
+
+        while (i < n1 && j < n2) {
+            double leftValue = Double.parseDouble(leftArray.get(i)[columnIndex]);
+            double rightValue = Double.parseDouble(rightArray.get(j)[columnIndex]);
+
+            if (leftValue <= rightValue) {
+                list.set(k, leftArray.get(i));
+                i++;
+            } else {
+                list.set(k, rightArray.get(j));
+                j++;
+            }
+            k++;
+        }
+
+        while (i < n1) {
+            list.set(k, leftArray.get(i));
+            i++;
+            k++;
+        }
+
+        while (j < n2) {
+            list.set(k, rightArray.get(j));
+            j++;
+            k++;
+        }
+    }
+
     public void sortBySellingPrice() {
-        ArrayList<String[]> list = model.getInventoryList();
-        int size = list.size();
-
-        for(int step = 0; step < size-1; step++){
-            int min_idx = step;
-            for(int i = step+1; i < size; i++){
-                if(Double.parseDouble(list.get(i)[4]) < Double.parseDouble(list.get(min_idx)[4])){
-                    min_idx = i;
-                }
-            }
-            String[] temp = list.get(step);
-            list.set(step, list.get(min_idx));
-            list.set(min_idx, temp);
-        }
-        loadSortingTable();
-    }
-
-    // Sort by Profit/Loss
-    public void sortByProfitLoss() {
-        ArrayList<String[]> list = model.getInventoryList();
-        int size = list.size();
-
-        for(int step = 0; step < size-1; step++){
-            int min_idx = step;
-            for(int i = step+1; i < size; i++){
-                if(Double.parseDouble(list.get(i)[6]) < Double.parseDouble(list.get(min_idx)[6])){
-                    min_idx = i;
-                }
-            }
-            String[] temp = list.get(step);
-            list.set(step, list.get(min_idx));
-            list.set(min_idx, temp);
-        }
-        loadSortingTable();
-    }
-
-
-    public int searchName(String searchValue, ArrayList<String[]> inventoryList, int low, int high) {
-        if (low > high) {
-            return -1;
-        }
-
-        int mid = low + (high - low) / 2;
-        String midItemName = inventoryList.get(mid)[1];  // Index 1 for ItemName
-
-        int comparison = searchValue.compareToIgnoreCase(midItemName);
-
-        if (comparison == 0) {
-            return mid;
-        } else if (comparison < 0) {
-            return searchName(searchValue, inventoryList, low, mid - 1);
-        } else {
-            return searchName(searchValue, inventoryList, mid + 1, high);
-        }
-    }
-
-    public void searchItemFromName(String itemName) {
         ArrayList<String[]> list = model.getInventoryList();
 
         if (list.isEmpty()) {
-            JOptionPane.showMessageDialog(view, "Inventory is empty");
             return;
         }
 
-        // Sort by Item Name
-        for (int i = 0; i < list.size() - 1; i++) {
-            for (int j = 0; j < list.size() - i - 1; j++) {
-                if (list.get(j)[1].compareToIgnoreCase(list.get(j + 1)[1]) > 0) {  // Index 1 for ItemName
-                    String[] temp = list.get(j);
-                    list.set(j, list.get(j + 1));
-                    list.set(j + 1, temp);
-                }
-            }
-        }
+        mergeSort(list, 0, list.size() - 1, 4);
 
-        foundIndex = searchName(itemName, list, 0, list.size() - 1);
+        loadSortingTable();
+    }
 
-        if (foundIndex == -1) {
-            JOptionPane.showMessageDialog(view, "Searched item is not available");
+    public void sortByProfitLoss() {
+        ArrayList<String[]> list = model.getInventoryList();
+
+        if (list.isEmpty()) {
             return;
         }
 
-        String[] record = list.get(foundIndex);
-        view.setChangedFields(record[0], record[1], record[2], record[3], record[4], record[5]);
+        mergeSort(list, 0, list.size() - 1, 6);
+
+        loadSortingTable();
+    }
+
+
+    
+
+    public void searchItemFromName(String itemName) {
+        ArrayList<String[]> list = model.getInventoryList();
+    if (list.isEmpty()) {
+        JOptionPane.showMessageDialog(view, "Inventory is empty");
+        return;
+    }
+    
+    foundIndex = -1;
+    for (int i = 0; i < list.size(); i++) {
+        if (list.get(i)[1].toLowerCase().contains(itemName.toLowerCase())) {
+            foundIndex = i;
+            break;
+        }
+    }
+    
+    if (foundIndex == -1) {
+        JOptionPane.showMessageDialog(view, "No item found matching: " + itemName);
+        return;
+    }
+    
+    String[] record = list.get(foundIndex);
+    String message = "Item Found!\n\n" +
+                    "Item ID: " + record[0] + "\n" +
+                    "Item Name: " + record[1] + "\n" +
+                    "Quantity: " + record[2] + "\n" +
+                    "Cost Price: " + record[3] + "\n" +
+                    "Selling Price: " + record[4] + "\n" +
+                    "Category: " + record[5] + "\n" +
+                    "Profit/Loss: " + record[6];
+    
+    JOptionPane.showMessageDialog(view, message, "Search Result", JOptionPane.INFORMATION_MESSAGE);
+    view.setChangedFields(record[0], record[1], record[2], record[3], record[4], record[5]);
     }
 
 
 
+    public void searchDeletedItemByID(String itemID) {
+    if(model.getDeletedTop() == -1) {
+        JOptionPane.showMessageDialog(view, "Deleted items history is empty");
+        return;
+    }
+    
+    ArrayList<String[]> deletedList = new ArrayList<>();
+    for(int i = 0; i <= model.getDeletedTop(); i++) {
+        if(model.getDeletedStack()[i][0] != null) {
+            deletedList.add(model.getDeletedStack()[i]);
+        }
+    }
+    
+    for (int i = 0; i < deletedList.size() - 1; i++) {
+        for (int j = 0; j < deletedList.size() - i - 1; j++) {
+            if (deletedList.get(j)[0].compareToIgnoreCase(deletedList.get(j + 1)[0]) > 0) {
+                String[] temp = deletedList.get(j);
+                deletedList.set(j, deletedList.get(j + 1));
+                deletedList.set(j + 1, temp);
+            }
+        }
+    }
+    
+    int index = searchID(itemID, deletedList, 0, deletedList.size() - 1);
+    
+    if (index == -1) {
+        JOptionPane.showMessageDialog(view, "No deleted item found with ID: " + itemID);
+        return;
+    }
+    
+    String[] record = deletedList.get(index);
+    String message = "Deleted Item Found!\n\n" +
+                    "Item ID: " + record[0] + "\n" +
+                    "Item Name: " + record[1] + "\n" +
+                    "Quantity: " + record[2] + "\n" +
+                    "Cost Price: " + record[3] + "\n" +
+                    "Selling Price: " + record[4] + "\n" +
+                    "Category: " + record[5] + "\n" +
+                    "Profit/Loss: " + record[6];
+    
+    JOptionPane.showMessageDialog(view, message, "Deleted Item Search Result", JOptionPane.INFORMATION_MESSAGE);
+}
+
+public void searchDeletedItemByName(String itemName) {
+    if(model.getDeletedTop() == -1) {
+        JOptionPane.showMessageDialog(view, "Deleted items history is empty");
+        return;
+    }
+    
+    int foundIdx = -1;
+    for (int i = 0; i <= model.getDeletedTop(); i++) {
+        if (model.getDeletedStack()[i][1] != null && 
+            model.getDeletedStack()[i][1].toLowerCase().contains(itemName.toLowerCase())) {
+            foundIdx = i;
+            break;
+        }
+    }
+    
+    if (foundIdx == -1) {
+        JOptionPane.showMessageDialog(view, "No deleted item found matching: " + itemName);
+        return;
+    }
+    
+    String[] record = model.getDeletedStack()[foundIdx];
+    String message = "Deleted Item Found!\n\n" +
+                    "Item ID: " + record[0] + "\n" +
+                    "Item Name: " + record[1] + "\n" +
+                    "Quantity: " + record[2] + "\n" +
+                    "Cost Price: " + record[3] + "\n" +
+                    "Selling Price: " + record[4] + "\n" +
+                    "Category: " + record[5] + "\n" +
+                    "Profit/Loss: " + record[6];
+    
+    JOptionPane.showMessageDialog(view, message, "Deleted Item Search Result", JOptionPane.INFORMATION_MESSAGE);
+}
 
 
         public String[][] getStack() {

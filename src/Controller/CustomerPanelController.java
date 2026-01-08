@@ -7,6 +7,7 @@ import Model.InventoryModel;
 import View.CustomerPanel;
 import java.util.ArrayList;
 import java.util.Queue;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 /**
  *
@@ -35,11 +36,11 @@ public final class CustomerPanelController {
         for(int i = 0; i < list.size(); i++){
             if(list.get(i)[0] != null){
                 loadcust.addRow(new Object[]{
-                    list.get(i)[0],  // ItemID
-                    list.get(i)[1],  // ItemName
-                    list.get(i)[2],  // Quantity
-                    list.get(i)[4],  // Price
-                    list.get(i)[5],  // Category
+                    list.get(i)[0],
+                    list.get(i)[1],
+                    list.get(i)[2],
+                    list.get(i)[4],
+                    list.get(i)[5],
                 });
             }
         }
@@ -55,112 +56,291 @@ public final class CustomerPanelController {
             return;
         }
         
-        // Convert queue to array to display (without removing from queue)
         for(String[] item : recentQueue) {
             tableModel.addRow(new Object[]{
-                item[0],  // ItemID
-                item[1],  // ItemName
-                item[2],  // Quantity
-                item[4],  // Price (not costPrice)
-                item[5]   // Category
+                item[0],
+                item[1],
+                item[2],
+                item[4],
+                item[5]
             });
         }
     }
     
     public void sortByID() {
-    ArrayList<String[]> list = model.getInventoryList();
-    int size = list.size();
+        ArrayList<String[]> list = model.getInventoryList();
+        int size = list.size();
+
+        for(int step = 0; step < size-1; step++){
+            int min_idx = step;
+            for(int i = step+1; i < size; i++){
+                if(list.get(i)[0].compareToIgnoreCase(list.get(min_idx)[0]) < 0){
+                    min_idx = i;
+                }
+            }
+            String[] temp = list.get(step);
+            list.set(step, list.get(min_idx));
+            list.set(min_idx, temp);
+        }
+        loadCustomerTable();
+    }
+
     
-    for(int step = 0; step < size-1; step++){
-        int min_idx = step;
-        for(int i = step+1; i < size; i++){
-            if(list.get(i)[0].compareToIgnoreCase(list.get(min_idx)[0]) < 0){
-                min_idx = i;
+        public void sortByName() {
+        ArrayList<String[]> list = model.getInventoryList();
+        int size = list.size();
+
+        for (int step = 1; step < size; step++) {
+            String[] key = list.get(step);
+            int j = step - 1;
+
+            while (j >= 0 && list.get(j)[1].compareToIgnoreCase(key[1]) > 0) {
+                list.set(j + 1, list.get(j));
+                j--;
+            }
+
+            list.set(j + 1, key);
+        }
+        loadCustomerTable();
+    }
+
+
+
+    public void sortByQuantity() {
+        ArrayList<String[]> list = model.getInventoryList();
+        int size = list.size();
+
+        for(int step = 0; step < size-1; step++){
+            int min_idx = step;
+            for(int i = step+1; i < size; i++){
+                if(Integer.parseInt(list.get(i)[2]) < Integer.parseInt(list.get(min_idx)[2])){
+                    min_idx = i;
+                }
+            }
+            String[] temp = list.get(step);
+            list.set(step, list.get(min_idx));
+            list.set(min_idx, temp);
+        }
+        loadCustomerTable();
+    }
+
+
+
+    private void mergeSort(ArrayList<String[]> list, int left, int right) {
+        if (left < right) {
+
+            int mid = left + (right - left) / 2;
+
+            mergeSort(list, left, mid);
+
+            mergeSort(list, mid + 1, right);
+
+            merge(list, left, mid, right);
+        }
+    }
+
+    private void merge(ArrayList<String[]> list, int left, int mid, int right) {
+        int n1 = mid - left + 1;
+        int n2 = right - mid;
+
+        ArrayList<String[]> leftArray = new ArrayList<>();
+        ArrayList<String[]> rightArray = new ArrayList<>();
+
+        for (int i = 0; i < n1; i++) {
+            leftArray.add(list.get(left + i));
+        }
+        for (int j = 0; j < n2; j++) {
+            rightArray.add(list.get(mid + 1 + j));
+        }
+
+        int i = 0, j = 0;
+        int k = left;
+
+        while (i < n1 && j < n2) {
+
+            double leftPrice = Double.parseDouble(leftArray.get(i)[4]);
+            double rightPrice = Double.parseDouble(rightArray.get(j)[4]);
+
+            if (leftPrice <= rightPrice) {
+                list.set(k, leftArray.get(i));
+                i++;
+            } else {
+                list.set(k, rightArray.get(j));
+                j++;
+            }
+            k++;
+        }
+
+        while (i < n1) {
+            list.set(k, leftArray.get(i));
+            i++;
+            k++;
+        }
+
+        while (j < n2) {
+            list.set(k, rightArray.get(j));
+            j++;
+            k++;
+        }
+    }
+
+    public void sortBySellingPrice() {
+        ArrayList<String[]> list = model.getInventoryList();
+
+        if (list.isEmpty()) {
+            return;
+        }
+
+        mergeSort(list, 0, list.size() - 1);
+
+        loadCustomerTable();
+    }
+    
+    public void searchItemFromID(String itemID) {
+        ArrayList<String[]> list = model.getInventoryList();
+        if (list.isEmpty()) {
+            JOptionPane.showMessageDialog(view, "Inventory is empty");
+            return;
+        }
+    
+        // Sort by Item ID
+        for (int i = 0; i < list.size() - 1; i++) {
+            for (int j = 0; j < list.size() - i - 1; j++) {
+                if (list.get(j)[0].compareToIgnoreCase(list.get(j + 1)[0]) > 0) {
+                    String[] temp = list.get(j);
+                    list.set(j, list.get(j + 1));
+                    list.set(j + 1, temp);
+                }
             }
         }
-        String[] temp = list.get(step);
-        list.set(step, list.get(min_idx));
-        list.set(min_idx, temp);
-    }
-    loadCustomerTable();
-}
-
-// Sort by ItemName
-public void sortByName() {
-    ArrayList<String[]> list = model.getInventoryList();
-    int size = list.size();
     
-    for(int step = 0; step < size-1; step++){
-        int min_idx = step;
-        for(int i = step+1; i < size; i++){
-            String name = list.get(i)[1];
-            if(name.compareToIgnoreCase(list.get(min_idx)[1]) < 0){
-                min_idx = i;
+        int foundIndex = searchID(itemID, list, 0, list.size() - 1);
+
+        if (foundIndex == -1) {
+            JOptionPane.showMessageDialog(view, "No item found with ID: " + itemID);
+            return;
+        }
+
+        String[] record = list.get(foundIndex);
+        String message = "Item Found!\n\n" +
+                        "Item ID: " + record[0] + "\n" +
+                        "Item Name: " + record[1] + "\n" +
+                        "Quantity: " + record[2] + "\n" +
+                        "Price: " + record[4] + "\n" +
+                        "Category: " + record[5];
+
+        JOptionPane.showMessageDialog(view, message, "Search Result", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private int searchID(String searchValue, ArrayList<String[]> inventoryList, int low, int high) {
+        if (low > high) {
+            return -1;
+        }
+        int mid = low + (high - low) / 2;
+        String midItemID = inventoryList.get(mid)[0];
+        int comparison = searchValue.compareToIgnoreCase(midItemID);
+
+        if (comparison == 0) {
+            return mid;
+        } else if (comparison < 0) {
+            return searchID(searchValue, inventoryList, low, mid - 1);
+        } else {
+            return searchID(searchValue, inventoryList, mid + 1, high);
+        }
+    }
+
+    public void searchItemFromName(String itemName) {
+        ArrayList<String[]> list = model.getInventoryList();
+        if (list.isEmpty()) {
+            JOptionPane.showMessageDialog(view, "Inventory is empty");
+            return;
+        }
+
+        // Linear search with partial matching
+        int foundIndex = -1;
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i)[1].toLowerCase().contains(itemName.toLowerCase())) {
+                foundIndex = i;
+                break;
             }
         }
-        String[] temp = list.get(step);
-        list.set(step, list.get(min_idx));
-        list.set(min_idx, temp);
-    }
-    loadCustomerTable();
-}
 
-// Sort by Quantity
-public void sortByQuantity() {
-    ArrayList<String[]> list = model.getInventoryList();
-    int size = list.size();
-    
-    for(int step = 0; step < size-1; step++){
-        int min_idx = step;
-        for(int i = step+1; i < size; i++){
-            if(Integer.parseInt(list.get(i)[2]) < Integer.parseInt(list.get(min_idx)[2])){
-                min_idx = i;
+        if (foundIndex == -1) {
+            JOptionPane.showMessageDialog(view, "No item found matching: " + itemName);
+            return;
+        }
+
+        String[] record = list.get(foundIndex);
+        String message = "Item Found!\n\n" +
+                        "Item ID: " + record[0] + "\n" +
+                        "Item Name: " + record[1] + "\n" +
+                        "Quantity: " + record[2] + "\n" +
+                        "Price: " + record[4] + "\n" +
+                        "Category: " + record[5];
+
+        JOptionPane.showMessageDialog(view, message, "Search Result", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public void searchRecentItemFromID(String itemID) {
+        Queue<String[]> recentQueue = model.getRecentItemsQueue();
+        if (recentQueue.isEmpty()) {
+            JOptionPane.showMessageDialog(view, "Recent items list is empty");
+            return;
+        }
+
+        // Linear search in queue
+        String[] foundItem = null;
+        for (String[] item : recentQueue) {
+            if (item[0].equalsIgnoreCase(itemID)) {
+                foundItem = item;
+                break;
             }
         }
-        String[] temp = list.get(step);
-        list.set(step, list.get(min_idx));
-        list.set(min_idx, temp);
+
+        if (foundItem == null) {
+            JOptionPane.showMessageDialog(view, "No recent item found with ID: " + itemID);
+            return;
+        }
+
+        String message = "Recent Item Found!\n\n" +
+                        "Item ID: " + foundItem[0] + "\n" +
+                        "Item Name: " + foundItem[1] + "\n" +
+                        "Quantity: " + foundItem[2] + "\n" +
+                        "Price: " + foundItem[4] + "\n" +
+                        "Category: " + foundItem[5];
+
+        JOptionPane.showMessageDialog(view, message, "Search Result", JOptionPane.INFORMATION_MESSAGE);
     }
-    loadCustomerTable();
-}
 
+    public void searchRecentItemFromName(String itemName) {
+        Queue<String[]> recentQueue = model.getRecentItemsQueue();
+        if (recentQueue.isEmpty()) {
+            JOptionPane.showMessageDialog(view, "Recent items list is empty");
+            return;
+        }
 
-
-// Sort by Selling Price
-public void sortBySellingPrice() {
-    ArrayList<String[]> list = model.getInventoryList();
-    int size = list.size();
-    
-    for(int step = 0; step < size-1; step++){
-        int min_idx = step;
-        for(int i = step+1; i < size; i++){
-            if(Double.parseDouble(list.get(i)[4]) < Double.parseDouble(list.get(min_idx)[4])){
-                min_idx = i;
+        // Linear search with partial matching in queue
+        String[] foundItem = null;
+        for (String[] item : recentQueue) {
+            if (item[1].toLowerCase().contains(itemName.toLowerCase())) {
+                foundItem = item;
+                break;
             }
         }
-        String[] temp = list.get(step);
-        list.set(step, list.get(min_idx));
-        list.set(min_idx, temp);
-    }
-    loadCustomerTable();
-}
 
-// Sort by Profit/Loss
-public void sortByProfitLoss() {
-    ArrayList<String[]> list = model.getInventoryList();
-    int size = list.size();
-    
-    for(int step = 0; step < size-1; step++){
-        int min_idx = step;
-        for(int i = step+1; i < size; i++){
-            if(Double.parseDouble(list.get(i)[6]) < Double.parseDouble(list.get(min_idx)[6])){
-                min_idx = i;
-            }
+        if (foundItem == null) {
+            JOptionPane.showMessageDialog(view, "No recent item found matching: " + itemName);
+            return;
         }
-        String[] temp = list.get(step);
-        list.set(step, list.get(min_idx));
-        list.set(min_idx, temp);
+
+        String message = "Recent Item Found!\n\n" +
+                        "Item ID: " + foundItem[0] + "\n" +
+                        "Item Name: " + foundItem[1] + "\n" +
+                        "Quantity: " + foundItem[2] + "\n" +
+                        "Price: " + foundItem[4] + "\n" +
+                        "Category: " + foundItem[5];
+
+        JOptionPane.showMessageDialog(view, message, "Search Result", JOptionPane.INFORMATION_MESSAGE);
     }
-    loadCustomerTable();
-}
+
 }
