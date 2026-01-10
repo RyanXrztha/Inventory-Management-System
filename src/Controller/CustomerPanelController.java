@@ -76,14 +76,15 @@ public final class CustomerPanelController {
         }
     }
     
-    public void sortByID() {
+    public void sortByID(boolean ascending) {
         ArrayList<String[]> list = model.getInventoryList();
         int size = list.size();
 
         for(int step = 0; step < size-1; step++){
             int min_idx = step;
             for(int i = step+1; i < size; i++){
-                if(list.get(i)[0].compareToIgnoreCase(list.get(min_idx)[0]) < 0){
+                int comparison = list.get(i)[0].compareToIgnoreCase(list.get(min_idx)[0]);
+                if(ascending ? comparison < 0 : comparison > 0){
                     min_idx = i;
                 }
             }
@@ -95,7 +96,7 @@ public final class CustomerPanelController {
     }
 
     
-        public void sortByName() {
+        public void sortByName(boolean ascending) {
         ArrayList<String[]> list = model.getInventoryList();
         int size = list.size();
 
@@ -103,9 +104,14 @@ public final class CustomerPanelController {
             String[] key = list.get(step);
             int j = step - 1;
 
-            while (j >= 0 && list.get(j)[1].compareToIgnoreCase(key[1]) > 0) {
-                list.set(j + 1, list.get(j));
-                j--;
+            while (j >= 0) {
+                int comparison = list.get(j)[1].compareToIgnoreCase(key[1]);
+                if(ascending ? comparison > 0 : comparison < 0) {
+                    list.set(j + 1, list.get(j));
+                    j--;
+                } else {
+                    break;
+                }
             }
 
             list.set(j + 1, key);
@@ -115,14 +121,16 @@ public final class CustomerPanelController {
 
 
 
-    public void sortByQuantity() {
+    public void sortByQuantity(boolean ascending) {
         ArrayList<String[]> list = model.getInventoryList();
         int size = list.size();
 
         for(int step = 0; step < size-1; step++){
             int min_idx = step;
             for(int i = step+1; i < size; i++){
-                if(Integer.parseInt(list.get(i)[2]) < Integer.parseInt(list.get(min_idx)[2])){
+                int qtyI = Integer.parseInt(list.get(i)[2]);
+                int qtyMin = Integer.parseInt(list.get(min_idx)[2]);
+                if(ascending ? qtyI < qtyMin : qtyI > qtyMin){
                     min_idx = i;
                 }
             }
@@ -135,20 +143,20 @@ public final class CustomerPanelController {
 
 
 
-    private void mergeSort(ArrayList<String[]> list, int left, int right) {
+    private void mergeSort(ArrayList<String[]> list, int left, int right, boolean ascending) {
         if (left < right) {
 
             int mid = left + (right - left) / 2;
 
-            mergeSort(list, left, mid);
+            mergeSort(list, left, mid, ascending);
 
-            mergeSort(list, mid + 1, right);
+            mergeSort(list, mid + 1, right, ascending);
 
-            merge(list, left, mid, right);
+            merge(list, left, mid, right, ascending);
         }
     }
 
-    private void merge(ArrayList<String[]> list, int left, int mid, int right) {
+    private void merge(ArrayList<String[]> list, int left, int mid, int right, boolean ascending) {
         int n1 = mid - left + 1;
         int n2 = right - mid;
 
@@ -169,8 +177,10 @@ public final class CustomerPanelController {
 
             double leftPrice = Double.parseDouble(leftArray.get(i)[4]);
             double rightPrice = Double.parseDouble(rightArray.get(j)[4]);
+            
+            boolean condition = ascending ? leftPrice <= rightPrice : leftPrice >= rightPrice;
 
-            if (leftPrice <= rightPrice) {
+            if (condition) {
                 list.set(k, leftArray.get(i));
                 i++;
             } else {
@@ -193,14 +203,14 @@ public final class CustomerPanelController {
         }
     }
 
-    public void sortBySellingPrice() {
+    public void sortBySellingPrice(boolean ascending) {
         ArrayList<String[]> list = model.getInventoryList();
 
         if (list.isEmpty()) {
             return;
         }
 
-        mergeSort(list, 0, list.size() - 1);
+        mergeSort(list, 0, list.size() - 1, ascending);
 
         loadCustomerTable();
     }

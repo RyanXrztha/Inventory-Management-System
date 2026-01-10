@@ -487,14 +487,15 @@ public final class AdminPanelController {
         }
     }
 
-    public void sortByID() {
+    public void sortByID(boolean ascending) {
         ArrayList<String[]> list = model.getInventoryList();
         int size = list.size();
 
         for(int step = 0; step < size-1; step++){
             int min_idx = step;
             for(int i = step+1; i < size; i++){
-                if(list.get(i)[0].compareToIgnoreCase(list.get(min_idx)[0]) < 0){
+                int comparison = list.get(i)[0].compareToIgnoreCase(list.get(min_idx)[0]);
+                if(ascending ? comparison < 0 : comparison > 0){
                     min_idx = i;
                 }
             }
@@ -505,7 +506,7 @@ public final class AdminPanelController {
         loadSortingTable();
     }
 
-    public void sortByName() {
+    public void sortByName(boolean ascending) {
         ArrayList<String[]> list = model.getInventoryList();
         int size = list.size();
 
@@ -513,9 +514,14 @@ public final class AdminPanelController {
             String[] key = list.get(step);
             int j = step - 1;
 
-            while (j >= 0 && list.get(j)[1].compareToIgnoreCase(key[1]) > 0) {
-                list.set(j + 1, list.get(j));
-                j = j - 1;
+            while (j >= 0) {
+                int comparison = list.get(j)[1].compareToIgnoreCase(key[1]);
+                if(ascending ? comparison > 0 : comparison < 0) {
+                    list.set(j + 1, list.get(j));
+                    j--;
+                } else {
+                    break;
+                }
             }
 
             list.set(j + 1, key);
@@ -524,17 +530,19 @@ public final class AdminPanelController {
         loadSortingTable();
     }
 
-    public void sortByQuantity() {
+    public void sortByQuantity(boolean ascending) {
         ArrayList<String[]> list = model.getInventoryList();
         int size = list.size();
 
         for(int step = 0; step < size-1; step++){
-            int min_idx = step;
-            for(int i = step+1; i < size; i++){
-                if(Integer.parseInt(list.get(i)[2]) < Integer.parseInt(list.get(min_idx)[2])){
-                    min_idx = i;
-                }
+        int min_idx = step;
+        for(int i = step+1; i < size; i++){
+            int qtyI = Integer.parseInt(list.get(i)[2]);
+            int qtyMin = Integer.parseInt(list.get(min_idx)[2]);
+            if(ascending ? qtyI < qtyMin : qtyI > qtyMin){
+                min_idx = i;
             }
+        }
             String[] temp = list.get(step);
             list.set(step, list.get(min_idx));
             list.set(min_idx, temp);
@@ -542,17 +550,19 @@ public final class AdminPanelController {
         loadSortingTable();
     }
 
-    public void sortByCostPrice() {
+    public void sortByCostPrice(boolean ascending) {
         ArrayList<String[]> list = model.getInventoryList();
         int size = list.size();
 
         for(int step = 0; step < size-1; step++){
             int min_idx = step;
             for(int i = step+1; i < size; i++){
-                if(Double.parseDouble(list.get(i)[3]) < Double.parseDouble(list.get(min_idx)[3])){
+                double priceI = Double.parseDouble(list.get(i)[3]);
+                double priceMin = Double.parseDouble(list.get(min_idx)[3]);
+                if(ascending ? priceI < priceMin : priceI > priceMin){
                     min_idx = i;
                 }
-            }
+        }
             String[] temp = list.get(step);
             list.set(step, list.get(min_idx));
             list.set(min_idx, temp);
@@ -560,20 +570,20 @@ public final class AdminPanelController {
         loadSortingTable();
     }
 
-    private void mergeSort(ArrayList<String[]> list, int left, int right, int columnIndex) {
+    private void mergeSort(ArrayList<String[]> list, int left, int right, int columnIndex, boolean ascending) {
         if (left < right) {
 
             int mid = left + (right - left) / 2;
 
-            mergeSort(list, left, mid, columnIndex);
+            mergeSort(list, left, mid, columnIndex, ascending);
 
-            mergeSort(list, mid + 1, right, columnIndex);
+            mergeSort(list, mid + 1, right, columnIndex, ascending);
 
-            merge(list, left, mid, right, columnIndex);
+            merge(list, left, mid, right, columnIndex, ascending);
         }
     }
 
-    private void merge(ArrayList<String[]> list, int left, int mid, int right, int columnIndex) {
+    private void merge(ArrayList<String[]> list, int left, int mid, int right, int columnIndex, boolean ascending) {
 
         int n1 = mid - left + 1;
         int n2 = right - mid;
@@ -594,8 +604,10 @@ public final class AdminPanelController {
         while (i < n1 && j < n2) {
             double leftValue = Double.parseDouble(leftArray.get(i)[columnIndex]);
             double rightValue = Double.parseDouble(rightArray.get(j)[columnIndex]);
+            
+            boolean condition = ascending ? leftValue <= rightValue : leftValue >= rightValue;
 
-            if (leftValue <= rightValue) {
+            if (condition) {
                 list.set(k, leftArray.get(i));
                 i++;
             } else {
@@ -618,26 +630,26 @@ public final class AdminPanelController {
         }
     }
 
-    public void sortBySellingPrice() {
+    public void sortBySellingPrice(boolean ascending) {
         ArrayList<String[]> list = model.getInventoryList();
 
         if (list.isEmpty()) {
             return;
         }
 
-        mergeSort(list, 0, list.size() - 1, 4);
+        mergeSort(list, 0, list.size() - 1, 4, ascending);
 
         loadSortingTable();
     }
 
-    public void sortByProfitLoss() {
+    public void sortByProfitLoss(boolean ascending) {
         ArrayList<String[]> list = model.getInventoryList();
 
         if (list.isEmpty()) {
             return;
         }
 
-        mergeSort(list, 0, list.size() - 1, 6);
+        mergeSort(list, 0, list.size() - 1, 6, ascending);
 
         loadSortingTable();
     }
