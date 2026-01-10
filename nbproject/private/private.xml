@@ -5,11 +5,11 @@
         <group>
             <file>file:/C:/Projects/Data%20Structure%20and%20Algorithm/Inventory%20Management%20System/src/Controller/LoginFormController.java</file>
             <file>file:/C:/Projects/Data%20Structure%20and%20Algorithm/Inventory%20Management%20System/src/View/LoginForm.java</file>
-            <file>file:/C:/Projects/Data%20Structure%20and%20Algorithm/Inventory%20Management%20System/src/View/AdminPanel.java</file>
-            <file>file:/C:/Projects/Data%20Structure%20and%20Algorithm/Inventory%20Management%20System/src/View/CustomerPanel.java</file>
             <file>file:/C:/Projects/Data%20Structure%20and%20Algorithm/Inventory%20Management%20System/src/Controller/CustomerPanelController.java</file>
             <file>file:/C:/Projects/Data%20Structure%20and%20Algorithm/Inventory%20Management%20System/src/Model/InventoryModel.java</file>
             <file>file:/C:/Projects/Data%20Structure%20and%20Algorithm/Inventory%20Management%20System/src/Controller/AdminPanelController.java</file>
+            <file>file:/C:/Projects/Data%20Structure%20and%20Algorithm/Inventory%20Management%20System/src/View/CustomerPanel.java</file>
+            <file>file:/C:/Projects/Data%20Structure%20and%20Algorithm/Inventory%20Management%20System/src/View/AdminPanel.java</file>
         </group>
     </open-files>
 </project-private>

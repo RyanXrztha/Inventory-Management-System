@@ -5,7 +5,6 @@
 package Model;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Queue;
 /**
  *
  * @author aryan
@@ -22,6 +21,8 @@ public class InventoryModel {
     String[][] deletedStack = new String[10][7];
     
     ArrayList<String[]> inventoryList = new ArrayList<>();
+    
+    private LinkedList<String[]> categoryLinkedList = new LinkedList<>();
     
     private final int MAX_RECENT_ITEMS = 5;
     private String[][] recentItemsQueue = new String[MAX_RECENT_ITEMS][7];
@@ -218,6 +219,10 @@ public class InventoryModel {
     
     public ArrayList<String[]> getInventoryList() {
         return inventoryList;
+    }
+    
+    public LinkedList<String[]> getCategoryLinkedList() {
+        return categoryLinkedList;
     }
     
     public int getSize() {

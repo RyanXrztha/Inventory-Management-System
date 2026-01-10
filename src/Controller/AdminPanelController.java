@@ -6,7 +6,7 @@ package Controller;
 import Model.InventoryModel;
 import View.AdminPanel;
 import java.util.ArrayList;
-import java.util.Queue;
+import java.util.LinkedList;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JOptionPane;
 /**
@@ -29,7 +29,7 @@ public final class AdminPanelController {
     private void loadPresentData() {
         if(dataLoaded) {
         return;
-    }
+        }
     
         push("1", "Bottle", "27", "105", "170", "Hydration Product");
         push("2", "Pencil", "100", "5", "10", "Stationery");
@@ -37,8 +37,14 @@ public final class AdminPanelController {
         push("4", "Bulb", "60", "200", "500", "Electronics");
         push("5", "Study Table", "80", "800", "1800", "Furniture");
     
-    dataLoaded = true;
-}
+        dataLoaded = true;
+        
+        if(model.getCategoryLinkedList().isEmpty()) {
+            for(String[] item : model.getInventoryList()) {
+                model.getCategoryLinkedList().add(item);
+            }
+        }
+    }
     
     public void push(String itemID, String itemName, String quantity, String costPrice, String price, String category) {
         if(model.getTop() == model.getSize() - 1){
@@ -148,6 +154,9 @@ public final class AdminPanelController {
         model.getInventoryList().add(record);
         
         model.addToRecentQueue(record);
+        
+                
+        model.getCategoryLinkedList().add(record);
     }
     
     public void pop() {
@@ -192,6 +201,13 @@ public final class AdminPanelController {
             model.getDeletedStack()[model.getDeletedTop()][4] = price;
             model.getDeletedStack()[model.getDeletedTop()][5] = category;
             model.getDeletedStack()[model.getDeletedTop()][6] = profitLoss;
+        }
+        
+        for(int i = 0; i < model.getCategoryLinkedList().size(); i++){
+            if(model.getCategoryLinkedList().get(i)[0].equals(itemID)){
+                model.getCategoryLinkedList().remove(i);
+                break;
+            }
         }
     }
     
@@ -242,6 +258,8 @@ public final class AdminPanelController {
 
         // Add to recent items queue
         model.addToRecentQueue(record);
+        
+        model.getCategoryLinkedList().add(record);
 
         // Remove from deleted stack
         for(int j = 0; j < 7; j++){
@@ -293,19 +311,19 @@ public final class AdminPanelController {
         }
         
         // Display from bottom to top of stack
-        for(int i = 0; i <= model.getTop(); i++){
-            if(model.getStack()[i][0] != null){
-                tableModel.addRow(new Object[]{
-                    model.getStack()[i][0], 
-                    model.getStack()[i][1], 
-                    model.getStack()[i][2], 
-                    model.getStack()[i][3], 
-                    model.getStack()[i][4], 
-                    model.getStack()[i][5], 
-                    model.getStack()[i][6]
-                });
-            }
+        for(int i = model.getTop(); i >= 0; i--){
+        if(model.getStack()[i][0] != null){
+            tableModel.addRow(new Object[]{
+                model.getStack()[i][0],
+                model.getStack()[i][1],
+                model.getStack()[i][2],
+                model.getStack()[i][3],
+                model.getStack()[i][4],
+                model.getStack()[i][5],
+                model.getStack()[i][6]
+            });
         }
+    }
     }
 
     
@@ -317,7 +335,7 @@ public final class AdminPanelController {
     }
     
     // Load from deleted stack, bottom to top
-    for(int i = 0; i <= model.getDeletedTop(); i++) {
+    for(int i = model.getDeletedTop(); i >= 0; i--) {
         if(model.getDeletedStack()[i][0] != null) {
             tableModel.addRow(new Object[]{
                 model.getDeletedStack()[i][0],
@@ -328,8 +346,8 @@ public final class AdminPanelController {
                 model.getDeletedStack()[i][5],
                 model.getDeletedStack()[i][6]
             });
-        }   
         }
+    }
     }
     
     
@@ -723,7 +741,7 @@ public void searchDeletedItemByName(String itemName) {
     
     if (foundIdx == -1) {
         JOptionPane.showMessageDialog(view, "No deleted item found matching: " + itemName);
-        return;
+        return; 
     }
     
     String[] record = model.getDeletedStack()[foundIdx];
@@ -748,4 +766,44 @@ public void searchDeletedItemByName(String itemName) {
             return model.getTop();
     }
     
+        
+    public void filterByCategory(String category) {
+        DefaultTableModel tableModel = (DefaultTableModel) view.getjTable4().getModel();
+        tableModel.setRowCount(0);
+
+        LinkedList<String[]> categoryList = model.getCategoryLinkedList();
+
+        if(categoryList.isEmpty()) {
+            JOptionPane.showMessageDialog(view, "No items available");
+            return;
+        }
+
+        if(category.equals("All Categories")) {
+            // Show all items
+            for(String[] item : categoryList) {
+                if(item[0] != null) {
+                    tableModel.addRow(new Object[]{
+                        item[0], item[1], item[2], item[3], item[4], item[5], item[6]
+                    });
+                }
+            }
+        } else {
+            // Filter by specific category
+            boolean found = false;
+            for(String[] item : categoryList) {
+                if(item[0] != null && item[5].equalsIgnoreCase(category)) {
+                    tableModel.addRow(new Object[]{
+                        item[0], item[1], item[2], item[3], item[4], item[5], item[6]
+                    });
+                    found = true;
+                }
+            }
+
+            if(!found) {
+                JOptionPane.showMessageDialog(view, "No items found in category: " + category);
+            }
+        }
+    }
+        
+        
 }

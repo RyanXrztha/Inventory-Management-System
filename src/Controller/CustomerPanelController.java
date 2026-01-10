@@ -6,7 +6,7 @@ package Controller;
 import Model.InventoryModel;
 import View.CustomerPanel;
 import java.util.ArrayList;
-import java.util.Queue;
+import java.util.LinkedList;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 /**
@@ -374,6 +374,52 @@ public final class CustomerPanelController {
                         "Category: " + foundItem[5];
         
         JOptionPane.showMessageDialog(view, message, "Search Result", JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    public void filterByCategory(String category) {
+        DefaultTableModel tableModel = (DefaultTableModel) view.getjTable3().getModel();
+        tableModel.setRowCount(0);
+        
+        LinkedList<String[]> categoryList = model.getCategoryLinkedList();
+        
+        if(categoryList.isEmpty()) {
+            JOptionPane.showMessageDialog(view, "No items available");
+            return;
+        }
+        
+        if(category.equals("All Categories")) {
+            // Show all items (customer view - without cost price and profit/loss)
+            for(String[] item : categoryList) {
+                if(item[0] != null) {
+                    tableModel.addRow(new Object[]{
+                        item[0],  // ItemID
+                        item[1],  // ItemName
+                        item[2],  // Quantity
+                        item[4],  // Price (selling price)
+                        item[5]   // Category
+                    });
+                }
+            }
+        } else {
+            // Filter by specific category
+            boolean found = false;
+            for(String[] item : categoryList) {
+                if(item[0] != null && item[5].equalsIgnoreCase(category)) {
+                    tableModel.addRow(new Object[]{
+                        item[0],  // ItemID
+                        item[1],  // ItemName
+                        item[2],  // Quantity
+                        item[4],  // Price (selling price)
+                        item[5]   // Category
+                    });
+                    found = true;
+                }
+            }
+            
+            if(!found) {
+                JOptionPane.showMessageDialog(view, "No items found in category: " + category);
+            }
+        }
     }
 
 }
