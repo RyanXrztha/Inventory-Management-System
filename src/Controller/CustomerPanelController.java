@@ -269,36 +269,57 @@ public final class CustomerPanelController {
     }
 
     public void searchItemFromName(String itemName) {
-        ArrayList<String[]> list = model.getInventoryList();
-        if (list.isEmpty()) {
-            JOptionPane.showMessageDialog(view, "Inventory is empty");
-            return;
-        }
-
-        // Linear search with partial matching
-        int foundIndex = -1;
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i)[1].toLowerCase().contains(itemName.toLowerCase())) {
-                foundIndex = i;
-                break;
-            }
-        }
-
-        if (foundIndex == -1) {
-            JOptionPane.showMessageDialog(view, "No item found matching: " + itemName);
-            return;
-        }
-
-        String[] record = list.get(foundIndex);
-        String message = "Item Found!\n\n" +
-                        "Item ID: " + record[0] + "\n" +
-                        "Item Name: " + record[1] + "\n" +
-                        "Quantity: " + record[2] + "\n" +
-                        "Price: " + record[4] + "\n" +
-                        "Category: " + record[5];
-
-        JOptionPane.showMessageDialog(view, message, "Search Result", JOptionPane.INFORMATION_MESSAGE);
+    ArrayList<String[]> list = model.getInventoryList();
+    if (list.isEmpty()) {
+        JOptionPane.showMessageDialog(view, "Inventory is empty");
+        return;
     }
+
+    // Linear search - Find all matching items
+    ArrayList<Integer> foundIndices = new ArrayList<>();
+    for (int i = 0; i < list.size(); i++) {
+        if (list.get(i)[1].toLowerCase().contains(itemName.toLowerCase())) {
+            foundIndices.add(i);
+        }
+    }
+
+    if (foundIndices.isEmpty()) {
+        JOptionPane.showMessageDialog(view, "No item found matching: " + itemName);
+        return;
+    }
+
+    // If multiple items found
+    if (foundIndices.size() > 1) {
+        String message = "Multiple items found!\n\n";
+        for (int i = 0; i < foundIndices.size(); i++) {
+            String[] record = list.get(foundIndices.get(i));
+            message += "Item " + (i + 1) + ":\n";
+            message += "Item ID: " + record[0] + "\n";
+            message += "Item Name: " + record[1] + "\n";
+            message += "Quantity: " + record[2] + "\n";
+            message += "Price: " + record[4] + "\n";
+            message += "Category: " + record[5] + "\n\n";
+        }
+        message += "Multiple items found. Please search by Item ID for specific details.";
+        JOptionPane.showMessageDialog(view, message, "Multiple Search Results", 
+                                      JOptionPane.INFORMATION_MESSAGE);
+        return;
+    }
+
+    // Single item found
+    int foundIndex = foundIndices.get(0);
+    String[] record = list.get(foundIndex);
+
+    String message = "Item Found!\n\n" +
+            "Item ID: " + record[0] + "\n" +
+            "Item Name: " + record[1] + "\n" +
+            "Quantity: " + record[2] + "\n" +
+            "Price: " + record[4] + "\n" +
+            "Category: " + record[5];
+
+    JOptionPane.showMessageDialog(view, message, "Search Result", 
+                                  JOptionPane.INFORMATION_MESSAGE);
+}
 
     public void searchRecentItemFromID(String itemID) {
         if(model.isRecentQueueEmpty()) {
@@ -344,47 +365,65 @@ public final class CustomerPanelController {
     }
 
     public void searchRecentItemFromName(String itemName) {
-        if(model.isRecentQueueEmpty()) {
-            JOptionPane.showMessageDialog(view, "Recent items list is empty");
-            return;
-        }
-        
-        String[][] queue = model.getRecentItemsQueue();
-        int front = model.getQueueFront();
-        int rear = model.getQueueRear();
-        int maxSize = model.getMaxRecentItems();
-        
-        String[] foundItem = null;
-        
-        // Manual circular queue search
-        int i = front;
-        while(true) {
-            if(queue[i] != null && queue[i][1].toLowerCase().contains(itemName.toLowerCase())) {
-                foundItem = queue[i];
-                break;
-            }
-            
-            if(i == rear) {
-                break;
-            }
-            
-            i = (i + 1) % maxSize;
-        }
-        
-        if (foundItem == null) {
-            JOptionPane.showMessageDialog(view, "No recent item found matching: " + itemName);
-            return;
-        }
-        
-        String message = "Recent Item Found!\n\n" +
-                        "Item ID: " + foundItem[0] + "\n" +
-                        "Item Name: " + foundItem[1] + "\n" +
-                        "Quantity: " + foundItem[2] + "\n" +
-                        "Price: " + foundItem[4] + "\n" +
-                        "Category: " + foundItem[5];
-        
-        JOptionPane.showMessageDialog(view, message, "Search Result", JOptionPane.INFORMATION_MESSAGE);
+    if(model.isRecentQueueEmpty()) {
+        JOptionPane.showMessageDialog(view, "Recent items list is empty");
+        return;
     }
+
+    String[][] queue = model.getRecentItemsQueue();
+    int front = model.getQueueFront();
+    int rear = model.getQueueRear();
+    int maxSize = model.getMaxRecentItems();
+
+    ArrayList<String[]> foundItems = new ArrayList<>();
+
+    // Linear search - Manual circular queue traversal to find all matches
+    int i = front;
+    while(true) {
+        if(queue[i] != null && queue[i][1].toLowerCase().contains(itemName.toLowerCase())) {
+            foundItems.add(queue[i]);
+        }
+        if(i == rear) {
+            break;
+        }
+        i = (i + 1) % maxSize;
+    }
+
+    if (foundItems.isEmpty()) {
+        JOptionPane.showMessageDialog(view, "No recent item found matching: " + itemName);
+        return;
+    }
+
+    // If multiple items found
+    if (foundItems.size() > 1) {
+        String message = "Multiple recent items found!\n\n";
+        for (int j = 0; j < foundItems.size(); j++) {
+            String[] foundItem = foundItems.get(j);
+            message += "Item " + (j + 1) + ":\n";
+            message += "Item ID: " + foundItem[0] + "\n";
+            message += "Item Name: " + foundItem[1] + "\n";
+            message += "Quantity: " + foundItem[2] + "\n";
+            message += "Price: " + foundItem[4] + "\n";
+            message += "Category: " + foundItem[5] + "\n\n";
+        }
+        message += "Multiple items found. Please search by Item ID for specific details.";
+        JOptionPane.showMessageDialog(view, message, "Multiple Search Results", 
+                                      JOptionPane.INFORMATION_MESSAGE);
+        return;
+    }
+
+    // Single item found
+    String[] foundItem = foundItems.get(0);
+    String message = "Recent Item Found!\n\n" +
+            "Item ID: " + foundItem[0] + "\n" +
+            "Item Name: " + foundItem[1] + "\n" +
+            "Quantity: " + foundItem[2] + "\n" +
+            "Price: " + foundItem[4] + "\n" +
+            "Category: " + foundItem[5];
+
+    JOptionPane.showMessageDialog(view, message, "Search Result", 
+                                  JOptionPane.INFORMATION_MESSAGE);
+}
     
     public void filterByCategory(String category) {
         DefaultTableModel tableModel = (DefaultTableModel) view.getjTable3().getModel();
