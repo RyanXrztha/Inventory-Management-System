@@ -31,7 +31,7 @@ public final class AdminPanelController {
         return;
         }
     
-        push("1", "Bottle", "27", "105", "170", "Hydration Product");
+        push("1", "Bottle", "27", "105", "170", "Drinks");
         push("2", "Pencil", "100", "5", "10", "Stationery");
         push("3", "Copy", "50", "40", "100", "Stationery");
         push("4", "Bulb", "60", "200", "500", "Electronics");
