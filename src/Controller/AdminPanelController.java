@@ -160,63 +160,63 @@ public final class AdminPanelController {
     }
     
     public void pop() {
-    if(model.getTop() == -1){
-        JOptionPane.showMessageDialog(view, "Inventory stack is empty.");
-        return;
-    }
+        if(model.getTop() == -1){
+            JOptionPane.showMessageDialog(view, "Inventory stack is empty.");
+            return;
+        }
 
-    String itemID = model.getStack()[model.getTop()][0];
-    String itemName = model.getStack()[model.getTop()][1];
-    String quantity = model.getStack()[model.getTop()][2];
-    String costPrice = model.getStack()[model.getTop()][3];
-    String price = model.getStack()[model.getTop()][4];
-    String category = model.getStack()[model.getTop()][5];
-    String profitLoss = model.getStack()[model.getTop()][6];
+        String itemID = model.getStack()[model.getTop()][0];
+        String itemName = model.getStack()[model.getTop()][1];
+        String quantity = model.getStack()[model.getTop()][2];
+        String costPrice = model.getStack()[model.getTop()][3];
+        String price = model.getStack()[model.getTop()][4];
+        String category = model.getStack()[model.getTop()][5];
+        String profitLoss = model.getStack()[model.getTop()][6];
 
-    JOptionPane.showMessageDialog(view, "Deleted: " + itemName);
+        JOptionPane.showMessageDialog(view, "Deleted: " + itemName);
 
-    // Clear from stack
-    for(int j = 0; j < 7; j++){
-        model.getStack()[model.getTop()][j] = null;
-    }
-    model.setTop(model.getTop() - 1);
+        // Clear from stack
+        for(int j = 0; j < 7; j++){
+            model.getStack()[model.getTop()][j] = null;
+        }
+        model.setTop(model.getTop() - 1);
 
-    // Remove from inventoryList - ADD NULL CHECK
-    for(int i = 0; i < model.getInventoryList().size(); i++){
-        if(model.getInventoryList().get(i) != null && 
-           model.getInventoryList().get(i)[0] != null &&
-           model.getInventoryList().get(i)[0].equals(itemID)){
-            model.getInventoryList().remove(i);
-            break;
+        // Remove from inventoryList - ADD NULL CHECK
+        for(int i = 0; i < model.getInventoryList().size(); i++){
+            if(model.getInventoryList().get(i) != null && 
+               model.getInventoryList().get(i)[0] != null &&
+               model.getInventoryList().get(i)[0].equals(itemID)){
+                model.getInventoryList().remove(i);
+                break;
+            }
+        }
+
+        model.removeFromRecentQueue(itemID);
+
+        // Add to deleted stack
+        if(model.getDeletedTop() == model.getfullSize() - 1){
+            JOptionPane.showMessageDialog(view, "Item deleted history is full");
+        } else {
+            model.setDeletedTop(model.getDeletedTop() + 1);
+            model.getDeletedStack()[model.getDeletedTop()][0] = itemID;
+            model.getDeletedStack()[model.getDeletedTop()][1] = itemName;
+            model.getDeletedStack()[model.getDeletedTop()][2] = quantity;
+            model.getDeletedStack()[model.getDeletedTop()][3] = costPrice;
+            model.getDeletedStack()[model.getDeletedTop()][4] = price;
+            model.getDeletedStack()[model.getDeletedTop()][5] = category;
+            model.getDeletedStack()[model.getDeletedTop()][6] = profitLoss;
+        }
+
+        // Remove from categoryLinkedList - ADD NULL CHECK
+        for(int i = 0; i < model.getCategoryLinkedList().size(); i++){
+            if(model.getCategoryLinkedList().get(i) != null && 
+               model.getCategoryLinkedList().get(i)[0] != null &&
+               model.getCategoryLinkedList().get(i)[0].equals(itemID)){
+                model.getCategoryLinkedList().remove(i);
+                break;
+            }
         }
     }
-
-    model.removeFromRecentQueue(itemID);
-
-    // Add to deleted stack
-    if(model.getDeletedTop() == model.getfullSize() - 1){
-        JOptionPane.showMessageDialog(view, "Item deleted history is full");
-    } else {
-        model.setDeletedTop(model.getDeletedTop() + 1);
-        model.getDeletedStack()[model.getDeletedTop()][0] = itemID;
-        model.getDeletedStack()[model.getDeletedTop()][1] = itemName;
-        model.getDeletedStack()[model.getDeletedTop()][2] = quantity;
-        model.getDeletedStack()[model.getDeletedTop()][3] = costPrice;
-        model.getDeletedStack()[model.getDeletedTop()][4] = price;
-        model.getDeletedStack()[model.getDeletedTop()][5] = category;
-        model.getDeletedStack()[model.getDeletedTop()][6] = profitLoss;
-    }
-
-    // Remove from categoryLinkedList - ADD NULL CHECK
-    for(int i = 0; i < model.getCategoryLinkedList().size(); i++){
-        if(model.getCategoryLinkedList().get(i) != null && 
-           model.getCategoryLinkedList().get(i)[0] != null &&
-           model.getCategoryLinkedList().get(i)[0].equals(itemID)){
-            model.getCategoryLinkedList().remove(i);
-            break;
-        }
-    }
-}
     
 
     public void recoverItem() {
@@ -317,20 +317,19 @@ public final class AdminPanelController {
             return;
         }
         
-        // Display from bottom to top of stack
         for(int i = model.getTop(); i >= 0; i--){
-        if(model.getStack()[i][0] != null){
-            tableModel.addRow(new Object[]{
-                model.getStack()[i][0],
-                model.getStack()[i][1],
-                model.getStack()[i][2],
-                model.getStack()[i][3],
-                model.getStack()[i][4],
-                model.getStack()[i][5],
-                model.getStack()[i][6]
-            });
+            if(model.getStack()[i][0] != null){
+                tableModel.addRow(new Object[]{
+                    model.getStack()[i][0],
+                    model.getStack()[i][1],
+                    model.getStack()[i][2],
+                    model.getStack()[i][3],
+                    model.getStack()[i][4],
+                    model.getStack()[i][5],
+                    model.getStack()[i][6]
+                });
+            }
         }
-    }
     }
 
     
@@ -341,7 +340,6 @@ public final class AdminPanelController {
         return;
     }
     
-    // Load from deleted stack, bottom to top
     for(int i = model.getDeletedTop(); i >= 0; i--) {
         if(model.getDeletedStack()[i][0] != null) {
             tableModel.addRow(new Object[]{
@@ -426,58 +424,58 @@ public final class AdminPanelController {
 
     
     public void updateItem(String itemID, String itemName, String quantity, String costPrice, String price, String category) {
-    if (foundIndex == -1) {
-        JOptionPane.showMessageDialog(view, "Please search item ID before updating values");
-        return;
-    }
-
-    ArrayList<String[]> list = model.getInventoryList();
-
-    double profitLoss;
-    try {
-        profitLoss = Double.parseDouble(price) - Double.parseDouble(costPrice);
-    } catch (NumberFormatException e) {
-        profitLoss = 0.0;
-    }
-
-    String[] oldRecord = list.get(foundIndex);
-    String oldItemID = oldRecord[0]; // Store old ID in case it changed
-    
-    // CREATE NEW ARRAY - don't modify the existing one!
-    String[] newRecord = {
-        itemID, 
-        itemName, 
-        quantity, 
-        costPrice, 
-        price, 
-        category, 
-        String.valueOf(profitLoss)
-    };
-
-    // Update in inventoryList
-    list.set(foundIndex, newRecord);
-
-    // Update in stack - CREATE A COPY
-    for (int i = 0; i <= model.getTop(); i++) {
-        if (model.getStack()[i][0] != null && model.getStack()[i][0].equals(oldItemID)) {
-            model.getStack()[i] = newRecord.clone(); // Use clone to create independent copy
-            break;
+        if (foundIndex == -1) {
+            JOptionPane.showMessageDialog(view, "Please search item ID before updating values");
+            return;
         }
-    }
 
-    // Update in category linked list - CREATE A COPY
-    for (int i = 0; i < model.getCategoryLinkedList().size(); i++) {
-        if (model.getCategoryLinkedList().get(i)[0] != null && 
-            model.getCategoryLinkedList().get(i)[0].equals(oldItemID)) {
-            model.getCategoryLinkedList().set(i, newRecord.clone()); // Use clone to create independent copy
-            break;
+        ArrayList<String[]> list = model.getInventoryList();
+
+        double profitLoss;
+        try {
+            profitLoss = Double.parseDouble(price) - Double.parseDouble(costPrice);
+        } catch (NumberFormatException e) {
+            profitLoss = 0.0;
         }
-    }
 
-    loadAdminPanelTable();
-    JOptionPane.showMessageDialog(view, "Item has been updated");
-    foundIndex = -1;
-}
+        String[] oldRecord = list.get(foundIndex);
+        String oldItemID = oldRecord[0]; // Store old ID in case it changed
+
+        // CREATE NEW ARRAY - don't modify the existing one!
+        String[] newRecord = {
+            itemID, 
+            itemName, 
+            quantity, 
+            costPrice, 
+            price, 
+            category, 
+            String.valueOf(profitLoss)
+        };
+
+        // Update in inventoryList
+        list.set(foundIndex, newRecord);
+
+        // Update in stack - CREATE A COPY
+        for (int i = 0; i <= model.getTop(); i++) {
+            if (model.getStack()[i][0] != null && model.getStack()[i][0].equals(oldItemID)) {
+                model.getStack()[i] = newRecord.clone(); // Use clone to create independent copy
+                break;
+            }
+        }
+
+        // Update in category linked list - CREATE A COPY
+        for (int i = 0; i < model.getCategoryLinkedList().size(); i++) {
+            if (model.getCategoryLinkedList().get(i)[0] != null && 
+                model.getCategoryLinkedList().get(i)[0].equals(oldItemID)) {
+                model.getCategoryLinkedList().set(i, newRecord.clone()); // Use clone to create independent copy
+                break;
+            }
+        }
+
+        loadAdminPanelTable();
+        JOptionPane.showMessageDialog(view, "Item has been updated");
+        foundIndex = -1;
+    }
 
 
     public void loadSortingTable() {
@@ -844,13 +842,6 @@ public final class AdminPanelController {
 }
 
 
-        public String[][] getStack() {
-            return model.getStack();
-        }
-
-        public int getTop() {
-            return model.getTop();
-    }
     
         
     public void filterByCategory(String category) {
@@ -866,7 +857,8 @@ public final class AdminPanelController {
 
         if(category.equals("All Categories")) {
             // Show all items
-            for(String[] item : categoryList) {
+            for(int i = categoryList.size() - 1; i >= 0; i--) {
+                String[] item = categoryList.get(i);
                 if(item[0] != null) {
                     tableModel.addRow(new Object[]{
                         item[0], item[1], item[2], item[3], item[4], item[5], item[6]
@@ -876,7 +868,8 @@ public final class AdminPanelController {
         } else {
             // Filter by specific category
             boolean found = false;
-            for(String[] item : categoryList) {
+            for(int i = categoryList.size() - 1; i >= 0; i--) {
+                String[] item = categoryList.get(i);
                 if(item[0] != null && item[5].equalsIgnoreCase(category)) {
                     tableModel.addRow(new Object[]{
                         item[0], item[1], item[2], item[3], item[4], item[5], item[6]

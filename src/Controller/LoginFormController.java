@@ -32,7 +32,7 @@ public class LoginFormController {
             return;
         }
 
-        if(username.equalsIgnoreCase("admin") && password.equalsIgnoreCase("admin")){
+        if(username.equalsIgnoreCase("admin189@gmail.com") && password.equalsIgnoreCase("admin")){
             JOptionPane.showMessageDialog(view, "Welcome Admin", "Login Sucessful", JOptionPane.INFORMATION_MESSAGE);
             AdminPanel admin = new AdminPanel();
             admin.setVisible(true);
