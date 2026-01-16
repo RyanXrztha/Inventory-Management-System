@@ -164,7 +164,7 @@ public final class AdminPanelController {
         
         model.getInventoryList().add(record);
         
-        model.addToRecentQueue(record);
+        model.addToRecentCirQueue(record);
         
                 
         String[] categoryCopy = new String[7];
@@ -207,8 +207,8 @@ public final class AdminPanelController {
             }
         }
 
-        model.removeFromRecentQueue(itemID);
-        model.rebuildRecentQueue();
+        model.removeFromRecentCirQueue(itemID);
+        model.rebuildRecentCirQueue();
 
         if(model.getDeletedTop() == model.getfullSize() - 1){
             JOptionPane.showMessageDialog(view, "Item deleted history is full");
@@ -272,7 +272,7 @@ public final class AdminPanelController {
         String[] record = {itemID, itemName, quantity, costPrice, price, category, profitLoss};
         model.getInventoryList().add(record);
 
-        model.addToRecentQueue(record);
+        model.addToRecentCirQueue(record);
         
         String[] categoryCopy = new String[7];
         for (int j = 0; j < 7; j++) {
@@ -593,14 +593,18 @@ public final class AdminPanelController {
         ArrayList<String[]> list = model.getInventoryList();
         int size = list.size();
 
-        for(int step = 0; step < size-1; step++){
+        for(int step = 0; step < size - 1; step++){
             int min_idx = step;
-            for(int i = step+1; i < size; i++){
-                int comparison = list.get(i)[0].compareToIgnoreCase(list.get(min_idx)[0]);
-                if(ascending ? comparison < 0 : comparison > 0){
+
+            for(int i = step + 1; i < size; i++){
+                int idI = Integer.parseInt(list.get(i)[0]);
+                int idMin = Integer.parseInt(list.get(min_idx)[0]);
+
+                if(ascending ? idI < idMin : idI > idMin){
                     min_idx = i;
                 }
             }
+
             String[] temp = list.get(step);
             list.set(step, list.get(min_idx));
             list.set(min_idx, temp);

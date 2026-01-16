@@ -16,8 +16,8 @@ public class LoginFormController {
     // It validates user and admin login data and directs user or admin to their respective panels.
     public static void Login(LoginForm view) {
 
-        String username = view.getUserName().trim();
-        String password = view.getPassword().trim();
+        String username = view.getUserName();
+        String password = view.getPassword();
 
         //Checks if both username and password are empty
         if (username.isEmpty() && password.isEmpty()) {

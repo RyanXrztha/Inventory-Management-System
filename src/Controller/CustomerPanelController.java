@@ -62,14 +62,18 @@ public final class CustomerPanelController {
         ArrayList<String[]> list = model.getInventoryList();
         int size = list.size();
 
-        for(int step = 0; step < size-1; step++){
+        for(int step = 0; step < size - 1; step++){
             int min_idx = step;
-            for(int i = step+1; i < size; i++){
-                int comparison = list.get(i)[0].compareToIgnoreCase(list.get(min_idx)[0]);
-                if(ascending ? comparison < 0 : comparison > 0){
+
+            for(int i = step + 1; i < size; i++){
+                int idI = Integer.parseInt(list.get(i)[0]);
+                int idMin = Integer.parseInt(list.get(min_idx)[0]);
+
+                if(ascending ? idI < idMin : idI > idMin){
                     min_idx = i;
                 }
             }
+
             String[] temp = list.get(step);
             list.set(step, list.get(min_idx));
             list.set(min_idx, temp);

@@ -24,9 +24,9 @@ public class InventoryModel {
     
     private LinkedList<String[]> categoryLinkedList = new LinkedList<>();
     
-    final int QUEUE_SIZE = 5;
-    int queueFront = -1;
-    int queueRear = -1;
+    final int queueSize = 5;
+    int front = -1;
+    int rear = -1;
     int itemCount = 0;
     String[][] recentQueue = new String[5][7];
 
@@ -46,37 +46,37 @@ public class InventoryModel {
     }
     
 
-    public void addToRecentQueue(String[] item) {
-        removeFromRecentQueue(item[0]);
+    public void addToRecentCirQueue(String[] item) {
+        removeFromRecentCirQueue(item[0]);
         
-        if(itemCount == QUEUE_SIZE) {
+        if(itemCount == queueSize) {
 
-            queueFront = (queueFront + 1) % QUEUE_SIZE;
+            front = (front + 1) % queueSize;
             itemCount--;
         }
         
-        if(queueFront == -1) {
-            queueFront = 0;
+        if(front == -1) {
+            front = 0;
         }
         
-        queueRear = (queueRear + 1) % QUEUE_SIZE;
+        rear = (rear + 1) % queueSize;
         
         String[] newItem = new String[7];
         for (int j = 0; j < 7; j++) {
             newItem[j] = item[j];
         }
-        recentQueue[queueRear] = newItem;
+        recentQueue[rear] = newItem;
         
         itemCount++;
     }
     
 
-    public void removeFromRecentQueue(String itemID) {
+    public void removeFromRecentCirQueue(String itemID) {
         if (itemCount == 0) {
             return;
         }
 
-        int current = queueFront;
+        int current = front;
         int foundIndex = -1;
 
         for (int i = 0; i < itemCount; i++) {
@@ -85,7 +85,7 @@ public class InventoryModel {
                 foundIndex = current;
                 break;  
             }
-            current = (current + 1) % QUEUE_SIZE;
+            current = (current + 1) % queueSize;
         }
 
         if (foundIndex == -1) {
@@ -93,7 +93,7 @@ public class InventoryModel {
         }
 
         LinkedList<String[]> temp = new LinkedList<>();
-        current = queueFront;
+        current = front;
         for (int i = 0; i < itemCount; i++) {
             if (current != foundIndex) {
                 String[] item = new String[7];
@@ -102,20 +102,20 @@ public class InventoryModel {
                 }
                 temp.add(item);
             }
-            current = (current + 1) % QUEUE_SIZE;
+            current = (current + 1) % queueSize;
         }
 
-        for (int i = 0; i < QUEUE_SIZE; i++) {
+        for (int i = 0; i < queueSize; i++) {
             recentQueue[i] = null;
         }
 
-        queueFront = -1;
-        queueRear = -1;
+        front = -1;
+        rear = -1;
         itemCount = temp.size();
 
         if (itemCount > 0) {
-            queueFront = 0;
-            queueRear = itemCount - 1;
+            front = 0;
+            rear = itemCount - 1;
             for (int i = 0; i < itemCount; i++) {
                 recentQueue[i] = temp.get(i);
             }
@@ -123,12 +123,12 @@ public class InventoryModel {
     }
     
 
-    public void rebuildRecentQueue() {
-        for (int i = 0; i < QUEUE_SIZE; i++) {
+    public void rebuildRecentCirQueue() {
+        for (int i = 0; i < queueSize; i++) {
             recentQueue[i] = null;
         }
-        queueFront = -1;
-        queueRear = -1;
+        front = -1;
+        rear = -1;
         itemCount = 0;
 
         ArrayList<String[]> list = getInventoryList();
@@ -136,7 +136,7 @@ public class InventoryModel {
             return;
         }
 
-        int count = Math.min(QUEUE_SIZE, list.size());
+        int count = Math.min(queueSize, list.size());
         int start = list.size() - count;
 
         for (int i = start; i < list.size(); i++) {
@@ -145,7 +145,7 @@ public class InventoryModel {
             for (int j = 0; j < 7; j++) {
                 copy[j] = item[j];
             }
-            addToRecentQueue(copy);
+            addToRecentCirQueue(copy);
         }
     }
 
@@ -156,14 +156,14 @@ public class InventoryModel {
             return result;
         }
 
-        int current = queueFront;
+        int current = front;
         for (int i = 0; i < itemCount; i++) {
             String[] item = new String[7];
             for (int j = 0; j < 7; j++) {
                 item[j] = recentQueue[current][j];
             }
             result[i] = item;
-            current = (current + 1) % QUEUE_SIZE;
+            current = (current + 1) % queueSize;
         }
 
         return result;
