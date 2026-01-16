@@ -75,69 +75,76 @@ public class InventoryModel {
     
 
     public void removeFromRecentQueue(String itemID) {
-        if(itemCount == 0) {
-            return;  // Queue is empty
-        }
-        
-        // Find the item in circular queue
-        int current = queueFront;
-        int foundIndex = -1;
-        
-        for(int i = 0; i < itemCount; i++) {
-            if(recentQueue[current] != null && 
-               recentQueue[current][0].equals(itemID)) {
-                foundIndex = current;
-                break;  
-            }
-            current = (current + 1) % QUEUE_SIZE;  // Move circularly
-        }
-        
-        // If not found, return
-        if(foundIndex == -1) {
-            return;
-        }
-        
-        // Shift elements after foundIndex to fill the gap (circularly)
-        int shiftFrom = foundIndex;
-        for(int i = 0; i < itemCount - 1; i++) {
-            int nextIndex = (shiftFrom + 1) % QUEUE_SIZE;
-            recentQueue[shiftFrom] = recentQueue[nextIndex];
-            shiftFrom = nextIndex;
-        }
-        
-        // Clear the rear position
-        recentQueue[queueRear] = null;
-        
-        // Move rear back circularly
-        if(itemCount == 1) {
-            // Queue becomes empty
-            queueFront = -1;
-            queueRear = -1;
-        } else {
-            queueRear = (queueRear - 1 + QUEUE_SIZE) % QUEUE_SIZE;
-        }
-        
-        itemCount--;
+    if (itemCount == 0) {
+        return;  // Queue is empty
     }
+    
+    // Find if the item exists (also gets foundIndex for efficiency)
+    int current = queueFront;
+    int foundIndex = -1;
+    
+    for (int i = 0; i < itemCount; i++) {
+        if (recentQueue[current] != null && 
+            recentQueue[current][0].equals(itemID)) {
+            foundIndex = current;
+            break;  
+        }
+        current = (current + 1) % QUEUE_SIZE;  // Move circularly
+    }
+    
+    // If not found, return
+    if (foundIndex == -1) {
+        return;
+    }
+    
+    // Collect remaining items in order using a temp list
+    LinkedList<String[]> temp = new LinkedList<>();
+    current = queueFront;
+    for (int i = 0; i < itemCount; i++) {
+        if (current != foundIndex) {
+            temp.add(recentQueue[current].clone());  // Clone to avoid reference issues
+        }
+        current = (current + 1) % QUEUE_SIZE;
+    }
+    
+    // Clear the queue array
+    for (int i = 0; i < QUEUE_SIZE; i++) {
+        recentQueue[i] = null;
+    }
+    
+    // Reset pointers
+    queueFront = -1;
+    queueRear = -1;
+    itemCount = temp.size();
+    
+    // Repopulate linearly if not empty
+    if (itemCount > 0) {
+        queueFront = 0;
+        queueRear = itemCount - 1;
+        for (int i = 0; i < itemCount; i++) {
+            recentQueue[i] = temp.get(i);
+        }
+    }
+}
     
 
     // ✅ ADD THESE GETTER METHODS:
     public String[][] getRecentItems() {
         String[][] result = new String[itemCount][7];
-        
-        if(itemCount == 0) {
+
+        if (itemCount == 0) {
             return result;
         }
-        
-        // Traverse from front to rear circularly
+
         int current = queueFront;
-        for(int i = 0; i < itemCount; i++) {
-            result[i] = recentQueue[current];
-            current = (current + 1) % QUEUE_SIZE;  // Move circularly
+        for (int i = 0; i < itemCount; i++) {
+            result[i] = recentQueue[current].clone(); // ✅ FIX
+            current = (current + 1) % QUEUE_SIZE;
         }
-        
+
         return result;
     }
+
 
     public int getRecentCount() {
         return itemCount;

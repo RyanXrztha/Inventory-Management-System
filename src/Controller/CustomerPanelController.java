@@ -54,7 +54,7 @@ public final class CustomerPanelController {
         int count = model.getRecentCount();
 
         // Simple loop through valid items
-        for (int i = count - 1; i >= 0; i--) {
+        for (int i = 0; i < count; i++) {
             if (recentArray[i] != null) {
                 tableModel.addRow(new Object[]{
                     recentArray[i][0],  // Item ID

@@ -619,7 +619,6 @@ public class AdminPanel extends javax.swing.JFrame {
 
         jPanel6.setBackground(new java.awt.Color(31, 41, 51));
 
-        jTable3.setBackground(new java.awt.Color(204, 204, 204));
         jTable3.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null, null},
@@ -907,7 +906,7 @@ public class AdminPanel extends javax.swing.JFrame {
     String searchType = (String) jComboBox1.getSelectedItem();
     
     if(searchValue.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Please enter a search value");
+        JOptionPane.showMessageDialog(this, "Please enter a value for searching");
         return;
     }
     
@@ -973,7 +972,7 @@ public class AdminPanel extends javax.swing.JFrame {
         String searchType = (String) jComboBox2.getSelectedItem();
 
         if(searchValue.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter a search value");
+            JOptionPane.showMessageDialog(this, "Please enter a value for searching");
             return;
         }
 
@@ -989,7 +988,7 @@ public class AdminPanel extends javax.swing.JFrame {
         String searchType = (String) jComboBox3.getSelectedItem();
 
         if(searchValue.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter a search value");
+            JOptionPane.showMessageDialog(this, "Please enter a value for searching");
             return;
         }
 
