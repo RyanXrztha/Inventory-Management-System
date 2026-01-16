@@ -210,12 +210,10 @@ public class LoginForm extends javax.swing.JFrame {
 
     private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
         if (jCheckBox1.isSelected()) {
-                    // Show password (set echo char to 0)
-                    jPasswordField1.setEchoChar((char) 0);
-                } else {
-                    // Hide password (use default echo char *)
-                    jPasswordField1.setEchoChar('*');
-                }
+            jPasswordField1.setEchoChar((char) 0);
+        } else {
+            jPasswordField1.setEchoChar('*');
+        }
     }//GEN-LAST:event_jCheckBox1ActionPerformed
 
     /**
@@ -258,10 +256,12 @@ public class LoginForm extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 
+    // It returns the entered username.
     public String getUserName(){
         return jTextField1.getText();
     }
 
+    // It returns the entered password.
     public String getPassword(){
         return String.valueOf(jPasswordField1.getPassword());
     }

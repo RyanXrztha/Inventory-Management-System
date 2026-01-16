@@ -17,12 +17,14 @@ public final class CustomerPanelController {
     private final InventoryModel model;
     private final CustomerPanel view;
 
+    // It initializes the customer controller and loads inventory data
     public CustomerPanelController(CustomerPanel view) {
         this.view = view;
         this.model = InventoryModel.geta(); 
         loadCustomerTable();
     }
 
+    // It loads all available items into the customer table.
     public void loadCustomerTable() {
         DefaultTableModel loadcust = (DefaultTableModel) view.getjTable2().getModel();
         loadcust.setRowCount(0);
@@ -35,17 +37,12 @@ public final class CustomerPanelController {
 
         for(int i = 0; i < list.size(); i++){
             if(list.get(i)[0] != null){
-                loadcust.addRow(new Object[]{
-                    list.get(i)[0],
-                    list.get(i)[1],
-                    list.get(i)[2],
-                    list.get(i)[4],
-                    list.get(i)[5],
-                });
+                loadcust.addRow(new Object[]{list.get(i)[0], list.get(i)[1], list.get(i)[2], list.get(i)[4], list.get(i)[5],});
             }
         }
     }
     
+    // It loads recently added items into the customer table
     public void loadRecentItemsTable() {
         DefaultTableModel tableModel = (DefaultTableModel) view.getjTable1().getModel();
         tableModel.setRowCount(0);
@@ -53,20 +50,14 @@ public final class CustomerPanelController {
         String[][] recentArray = model.getRecentItems();
         int count = model.getRecentCount();
 
-        // Simple loop through valid items
         for (int i = 0; i < count; i++) {
             if (recentArray[i] != null) {
-                tableModel.addRow(new Object[]{
-                    recentArray[i][0],  // Item ID
-                    recentArray[i][1],  // Item Name
-                    recentArray[i][2],  // Quantity
-                    recentArray[i][4],  // Selling Price
-                    recentArray[i][5]   // Category
-                });
+                tableModel.addRow(new Object[]{recentArray[i][0], recentArray[i][1], recentArray[i][2], recentArray[i][4], recentArray[i][5]});
             }
         }
     }
     
+    // It sorts items by ID for customer panel.
     public void sortByID(boolean ascending) {
         ArrayList<String[]> list = model.getInventoryList();
         int size = list.size();
@@ -86,8 +77,8 @@ public final class CustomerPanelController {
         loadCustomerTable();
     }
 
-    
-        public void sortByName(boolean ascending) {
+    // It sorts items by name for customer panel
+    public void sortByName(boolean ascending) {
         ArrayList<String[]> list = model.getInventoryList();
         int size = list.size();
 
@@ -112,6 +103,7 @@ public final class CustomerPanelController {
 
 
 
+    // It sorts items by quantity for customer panel
     public void sortByQuantity(boolean ascending) {
         ArrayList<String[]> list = model.getInventoryList();
         int size = list.size();
@@ -134,6 +126,7 @@ public final class CustomerPanelController {
 
 
 
+    //Divide a big arraylist into individual part
     private void mergeSort(ArrayList<String[]> list, int left, int right, boolean ascending) {
         if (left < right) {
 
@@ -147,6 +140,7 @@ public final class CustomerPanelController {
         }
     }
 
+    //Sorts and merge each individual parts and forms bigger array
     private void merge(ArrayList<String[]> list, int left, int mid, int right, boolean ascending) {
         int n1 = mid - left + 1;
         int n2 = right - mid;
@@ -194,6 +188,7 @@ public final class CustomerPanelController {
         }
     }
 
+    // It sorts items by selling price for customer panel
     public void sortBySellingPrice(boolean ascending) {
         ArrayList<String[]> list = model.getInventoryList();
 
@@ -206,8 +201,10 @@ public final class CustomerPanelController {
         loadCustomerTable();
     }
     
+    // It searches an item using its ID and displays the result
     public void searchItemFromID(String itemID) {
         ArrayList<String[]> list = model.getInventoryList();
+        // It checks whether inventory is empty
         if (list.isEmpty()) {
             JOptionPane.showMessageDialog(view, "Inventory is empty");
             return;
@@ -259,92 +256,90 @@ public final class CustomerPanelController {
         }
     }
 
+    // It searches items using their name and shows matching results
     public void searchItemFromName(String itemName) {
-    ArrayList<String[]> list = model.getInventoryList();
-    if (list.isEmpty()) {
-        JOptionPane.showMessageDialog(view, "Inventory is empty");
-        return;
-    }
-
-    // Linear search - Find all matching items
-    ArrayList<Integer> foundIndices = new ArrayList<>();
-    for (int i = 0; i < list.size(); i++) {
-        if (list.get(i)[1].toLowerCase().contains(itemName.toLowerCase())) {
-            foundIndices.add(i);
+        ArrayList<String[]> list = model.getInventoryList();
+        // It checks whether inventory has data
+        if (list.isEmpty()) {
+            JOptionPane.showMessageDialog(view, "Inventory is empty");
+            return;
         }
-    }
 
-    if (foundIndices.isEmpty()) {
-        JOptionPane.showMessageDialog(view, "No item found matching: " + itemName);
-        return;
-    }
-
-    // If multiple items found
-    if (foundIndices.size() > 1) {
-        String message = "Multiple items found!\n\n";
-        for (int i = 0; i < foundIndices.size(); i++) {
-            String[] record = list.get(foundIndices.get(i));
-            message += "Item " + (i + 1) + ":\n";
-            message += "Item ID: " + record[0] + "\n";
-            message += "Item Name: " + record[1] + "\n";
-            message += "Quantity: " + record[2] + "\n";
-            message += "Price: " + record[4] + "\n";
-            message += "Category: " + record[5] + "\n\n";
+        ArrayList<Integer> foundIndices = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i)[1].toLowerCase().contains(itemName.toLowerCase())) {
+                foundIndices.add(i);
+            }
         }
-        message += "Multiple items found. Please search by Item ID for specific details.";
-        JOptionPane.showMessageDialog(view, message, "Multiple Search Results", 
-                                      JOptionPane.INFORMATION_MESSAGE);
-        return;
+
+        if (foundIndices.isEmpty()) {
+            JOptionPane.showMessageDialog(view, "No item found matching: " + itemName);
+            return;
+        }
+
+        if (foundIndices.size() > 1) {
+            String message = "Multiple items found!\n\n";
+            for (int i = 0; i < foundIndices.size(); i++) {
+                String[] record = list.get(foundIndices.get(i));
+                message += "Item " + (i + 1) + ":\n";
+                message += "Item ID: " + record[0] + "\n";
+                message += "Item Name: " + record[1] + "\n";
+                message += "Quantity: " + record[2] + "\n";
+                message += "Price: " + record[4] + "\n";
+                message += "Category: " + record[5] + "\n\n";
+            }
+            message += "Multiple items found. Please search by Item ID for specific details.";
+            JOptionPane.showMessageDialog(view, message, "Multiple Search Results", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        int foundIndex = foundIndices.get(0);
+        String[] record = list.get(foundIndex);
+
+        String message = "Item Found!\n\n" +
+                "Item ID: " + record[0] + "\n" +
+                "Item Name: " + record[1] + "\n" +
+                "Quantity: " + record[2] + "\n" +
+                "Price: " + record[4] + "\n" +
+                "Category: " + record[5];
+
+        JOptionPane.showMessageDialog(view, message, "Search Result", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // Single item found
-    int foundIndex = foundIndices.get(0);
-    String[] record = list.get(foundIndex);
-
-    String message = "Item Found!\n\n" +
-            "Item ID: " + record[0] + "\n" +
-            "Item Name: " + record[1] + "\n" +
-            "Quantity: " + record[2] + "\n" +
-            "Price: " + record[4] + "\n" +
-            "Category: " + record[5];
-
-    JOptionPane.showMessageDialog(view, message, "Search Result", 
-                                  JOptionPane.INFORMATION_MESSAGE);
-}
-
+    // It searches a recent item using its ID
     public void searchRecentItemFromID(String itemID) {
-    String[][] recentArray = model.getRecentItems();
-    int count = model.getRecentCount();
-    
-    if (count == 0) {
-        JOptionPane.showMessageDialog(view, "Recent items list is empty");
-        return;
-    }
-    
-    // Simple linear search
-    String[] foundItem = null;
-    for (int i = 0; i < count; i++) {
-        if (recentArray[i] != null && recentArray[i][0].equalsIgnoreCase(itemID)) {
-            foundItem = recentArray[i];
-            break;
-        }
-    }
-    
-    if (foundItem == null) {
-        JOptionPane.showMessageDialog(view, "No recent item found with ID: " + itemID);
-        return;
-    }
-    
-    String message = "Recent Item Found!\n\n" +
-                    "Item ID: " + foundItem[0] + "\n" +
-                    "Item Name: " + foundItem[1] + "\n" +
-                    "Quantity: " + foundItem[2] + "\n" +
-                    "Price: " + foundItem[4] + "\n" +
-                    "Category: " + foundItem[5];
-    
-    JOptionPane.showMessageDialog(view, message, "Search Result", JOptionPane.INFORMATION_MESSAGE);
-}
+        String[][] recentArray = model.getRecentItems();
+        int count = model.getRecentCount();
 
+        if (count == 0) {
+            JOptionPane.showMessageDialog(view, "Recent items list is empty");
+            return;
+        }
+
+        String[] foundItem = null;
+        for (int i = 0; i < count; i++) {
+            if (recentArray[i] != null && recentArray[i][0].equalsIgnoreCase(itemID)) {
+                foundItem = recentArray[i];
+                break;
+            }
+        }
+
+        if (foundItem == null) {
+            JOptionPane.showMessageDialog(view, "No recent item found with ID: " + itemID);
+            return;
+        }
+
+        String message = "Recent Item Found!\n\n" +
+            "Item ID: " + foundItem[0] + "\n" +
+            "Item Name: " + foundItem[1] + "\n" +
+            "Quantity: " + foundItem[2] + "\n" +
+            "Price: " + foundItem[4] + "\n" +
+            "Category: " + foundItem[5];
+
+            JOptionPane.showMessageDialog(view, message, "Search Result", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    // It searches recent items using their name.
     public void searchRecentItemFromName(String itemName) {
         String[][] recentArray = model.getRecentItems();
         int count = model.getRecentCount();
@@ -354,7 +349,6 @@ public final class CustomerPanelController {
             return;
         }
 
-        // Find all matching items manually
         ArrayList<String[]> foundItems = new ArrayList<>();
 
         for (int i = 0; i < count; i++) {
@@ -369,7 +363,6 @@ public final class CustomerPanelController {
             return;
         }
 
-        // If multiple items found
         if (foundItems.size() > 1) {
             String message = "Multiple recent items found!\n\n";
             for (int j = 0; j < foundItems.size(); j++) {
@@ -382,8 +375,7 @@ public final class CustomerPanelController {
                 message = message + "Category: " + foundItem[5] + "\n\n";
             }
             message = message + "Multiple items found. Please search by Item ID for specific details.";
-            JOptionPane.showMessageDialog(view, message, "Multiple Search Results", 
-                                          JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(view, message, "Multiple Search Results", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 
@@ -396,10 +388,10 @@ public final class CustomerPanelController {
                 "Price: " + foundItem[4] + "\n" +
                 "Category: " + foundItem[5];
 
-        JOptionPane.showMessageDialog(view, message, "Search Result", 
-                                      JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(view, message, "Search Result", JOptionPane.INFORMATION_MESSAGE);
     }
     
+    // It filters items by category for customer panel
     public void filterByCategory(String category) {
         DefaultTableModel tableModel = (DefaultTableModel) view.getjTable3().getModel();
         tableModel.setRowCount(0);
@@ -412,32 +404,18 @@ public final class CustomerPanelController {
         }
         
         if(category.equals("All Categories")) {
-            // Show all items (customer view - without cost price and profit/loss)
             for(int i = categoryList.size() - 1; i >= 0; i--) {
                 String[] item = categoryList.get(i);
                 if(item[0] != null) {
-                    tableModel.addRow(new Object[]{
-                        item[0],
-                        item[1],
-                        item[2],
-                        item[4],
-                        item[5]
-                    });
+                    tableModel.addRow(new Object[]{item[0], item[1], item[2], item[4], item[5]});
                 }
             }
         } else {
-            // Filter by specific category
             boolean found = false;
             for(int i = categoryList.size() - 1; i >= 0; i--) {
                 String[] item = categoryList.get(i);
                 if(item[0] != null && item[5].equalsIgnoreCase(category)) {
-                    tableModel.addRow(new Object[]{
-                        item[0],
-                        item[1],
-                        item[2],
-                        item[4],
-                        item[5]
-                    });
+                    tableModel.addRow(new Object[]{item[0], item[1], item[2], item[4], item[5]});
                     found = true;
                 }
             }
@@ -447,5 +425,4 @@ public final class CustomerPanelController {
             }
         }
     }
-
 }

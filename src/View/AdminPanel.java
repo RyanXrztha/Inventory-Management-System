@@ -37,8 +37,9 @@ public class AdminPanel extends javax.swing.JFrame {
         cl.show(jPanel4, "card3");
     }
     
+    // It designs table's font size, color and many more
     private void setupTableDesign(JTable table) {
-        // ===== Table Header =====
+
         JTableHeader header = table.getTableHeader();
         header.setBackground(Color.BLACK);
         header.setForeground(new Color(31, 41, 55));
@@ -46,28 +47,24 @@ public class AdminPanel extends javax.swing.JFrame {
         header.setPreferredSize(new Dimension(header.getWidth(), 36));
         header.setReorderingAllowed(false);
 
-       // ===== Table Body =====
-        table.setBackground(Color.WHITE);                     // Default row background
-        table.setForeground(new Color(31, 41, 55));           // #1F2933
+        table.setBackground(Color.WHITE);
+        table.setForeground(new Color(31, 41, 55));
         table.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         table.setRowHeight(32);
 
-        // ===== Selection =====
-        table.setSelectionBackground(new Color(219, 234, 254)); // #DBEAFE
-        table.setSelectionForeground(new Color(17, 24, 39));    // #111827
+        table.setSelectionBackground(new Color(219, 234, 254));
+        table.setSelectionForeground(new Color(17, 24, 39));
 
-        // ===== Grid =====
-        table.setGridColor(new Color(229, 231, 235));         // #E5E7EB
+        table.setGridColor(new Color(229, 231, 235));
         table.setShowVerticalLines(false);
         table.setShowHorizontalLines(true);
 
-        // ===== Table Container =====
         table.setFillsViewportHeight(true);
     }
 
 
 
-    
+    // It fills the input fields with selected item data
     public void setChangedFields(String itemID, String itemName, String quantity, String costPrice, String price, String category) {
         jTextField1.setText(itemID);
         jTextField2.setText(itemName);
@@ -78,20 +75,22 @@ public class AdminPanel extends javax.swing.JFrame {
     }
 
  
-   
+   // It returns the deleted items table
     public JTable getjTable2() {
         return jTable2;
     }
     
+    // It returns the inventory table
     public JTable getjTable3() {
         return jTable3;
     }
     
+    // It returns the sorting table.
     public JTable getjTable1() {
         return jTable1;
     }
 
-
+    // It returns the category filter table.
     public JTable getjTable4() {
         return jTable4;
     }

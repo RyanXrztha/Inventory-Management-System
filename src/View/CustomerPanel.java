@@ -38,6 +38,7 @@ public class CustomerPanel extends javax.swing.JFrame {
         cl.show(jPanel6, "card2");
     }
     
+    // It designs table's font size, color and many more
     private void setupTableDesign(JTable table) {
         JTableHeader header = table.getTableHeader();
         header.setBackground(Color.BLACK);
@@ -46,33 +47,32 @@ public class CustomerPanel extends javax.swing.JFrame {
         header.setPreferredSize(new Dimension(header.getWidth(), 36));
         header.setReorderingAllowed(false);
 
-       // ===== Table Body =====
-        table.setBackground(Color.WHITE);                     // Default row background
-        table.setForeground(new Color(31, 41, 55));           // #1F2933
+        table.setBackground(Color.WHITE);
+        table.setForeground(new Color(31, 41, 55));
         table.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         table.setRowHeight(32);
 
-        // ===== Selection =====
-        table.setSelectionBackground(new Color(219, 234, 254)); // #DBEAFE
-        table.setSelectionForeground(new Color(17, 24, 39));    // #111827
+        table.setSelectionBackground(new Color(219, 234, 254));
+        table.setSelectionForeground(new Color(17, 24, 39));
 
-        // ===== Grid =====
-        table.setGridColor(new Color(229, 231, 235));         // #E5E7EB
+        table.setGridColor(new Color(229, 231, 235));
         table.setShowVerticalLines(false);
         table.setShowHorizontalLines(true);
 
-        // ===== Table Container =====
         table.setFillsViewportHeight(true);
     }
     
+    // It returns the recent items table.
     public JTable getjTable1() {
         return jTable1;
     }
 
+    // It returns the main item display table.
     public JTable getjTable2() {
         return jTable2;
     }
     
+    // It returns the category filter table.
     public JTable getjTable3() {
         return jTable3;
     }

@@ -24,10 +24,10 @@ public class InventoryModel {
     
     private LinkedList<String[]> categoryLinkedList = new LinkedList<>();
     
-    final int QUEUE_SIZE = 5;  // Max 5 recent items
+    final int QUEUE_SIZE = 5;
     int queueFront = -1;
     int queueRear = -1;
-    int itemCount = 0;  // Track number of items in queue
+    int itemCount = 0;
     String[][] recentQueue = new String[5][7];
 
     
@@ -47,88 +47,108 @@ public class InventoryModel {
     
 
     public void addToRecentQueue(String[] item) {
-        // Remove duplicate if exists
         removeFromRecentQueue(item[0]);
         
-        // Check if queue is full
         if(itemCount == QUEUE_SIZE) {
-            // Queue is full, need to remove oldest (at front)
-            // Move front forward circularly
+
             queueFront = (queueFront + 1) % QUEUE_SIZE;
             itemCount--;
         }
         
-        // If queue is empty, set front to 0
         if(queueFront == -1) {
             queueFront = 0;
         }
         
-        // Move rear forward CIRCULARLY (This is the key!)
         queueRear = (queueRear + 1) % QUEUE_SIZE;
         
-        // Add item at rear position
-        recentQueue[queueRear] = item.clone();
-;
+        String[] newItem = new String[7];
+        for (int j = 0; j < 7; j++) {
+            newItem[j] = item[j];
+        }
+        recentQueue[queueRear] = newItem;
         
         itemCount++;
     }
     
 
     public void removeFromRecentQueue(String itemID) {
-    if (itemCount == 0) {
-        return;  // Queue is empty
-    }
-    
-    // Find if the item exists (also gets foundIndex for efficiency)
-    int current = queueFront;
-    int foundIndex = -1;
-    
-    for (int i = 0; i < itemCount; i++) {
-        if (recentQueue[current] != null && 
-            recentQueue[current][0].equals(itemID)) {
-            foundIndex = current;
-            break;  
+        if (itemCount == 0) {
+            return;
         }
-        current = (current + 1) % QUEUE_SIZE;  // Move circularly
-    }
-    
-    // If not found, return
-    if (foundIndex == -1) {
-        return;
-    }
-    
-    // Collect remaining items in order using a temp list
-    LinkedList<String[]> temp = new LinkedList<>();
-    current = queueFront;
-    for (int i = 0; i < itemCount; i++) {
-        if (current != foundIndex) {
-            temp.add(recentQueue[current].clone());  // Clone to avoid reference issues
-        }
-        current = (current + 1) % QUEUE_SIZE;
-    }
-    
-    // Clear the queue array
-    for (int i = 0; i < QUEUE_SIZE; i++) {
-        recentQueue[i] = null;
-    }
-    
-    // Reset pointers
-    queueFront = -1;
-    queueRear = -1;
-    itemCount = temp.size();
-    
-    // Repopulate linearly if not empty
-    if (itemCount > 0) {
-        queueFront = 0;
-        queueRear = itemCount - 1;
+
+        int current = queueFront;
+        int foundIndex = -1;
+
         for (int i = 0; i < itemCount; i++) {
-            recentQueue[i] = temp.get(i);
+            if (recentQueue[current] != null && 
+                recentQueue[current][0].equals(itemID)) {
+                foundIndex = current;
+                break;  
+            }
+            current = (current + 1) % QUEUE_SIZE;
+        }
+
+        if (foundIndex == -1) {
+            return;
+        }
+
+        LinkedList<String[]> temp = new LinkedList<>();
+        current = queueFront;
+        for (int i = 0; i < itemCount; i++) {
+            if (current != foundIndex) {
+                String[] item = new String[7];
+                for (int j = 0; j < 7; j++) {
+                    item[j] = recentQueue[current][j];
+                }
+                temp.add(item);
+            }
+            current = (current + 1) % QUEUE_SIZE;
+        }
+
+        for (int i = 0; i < QUEUE_SIZE; i++) {
+            recentQueue[i] = null;
+        }
+
+        queueFront = -1;
+        queueRear = -1;
+        itemCount = temp.size();
+
+        if (itemCount > 0) {
+            queueFront = 0;
+            queueRear = itemCount - 1;
+            for (int i = 0; i < itemCount; i++) {
+                recentQueue[i] = temp.get(i);
+            }
         }
     }
-}
     
 
-    // ✅ ADD THESE GETTER METHODS:
+    public void rebuildRecentQueue() {
+        for (int i = 0; i < QUEUE_SIZE; i++) {
+            recentQueue[i] = null;
+        }
+        queueFront = -1;
+        queueRear = -1;
+        itemCount = 0;
+
+        ArrayList<String[]> list = getInventoryList();
+        if (list.isEmpty()) {
+            return;
+        }
+
+        int count = Math.min(QUEUE_SIZE, list.size());
+        int start = list.size() - count;
+
+        for (int i = start; i < list.size(); i++) {
+            String[] item = list.get(i);
+            String[] copy = new String[7];
+            for (int j = 0; j < 7; j++) {
+                copy[j] = item[j];
+            }
+            addToRecentQueue(copy);
+        }
+    }
+
     public String[][] getRecentItems() {
         String[][] result = new String[itemCount][7];
 
@@ -138,7 +158,11 @@ public class InventoryModel {
 
         int current = queueFront;
         for (int i = 0; i < itemCount; i++) {
-            result[i] = recentQueue[current].clone(); // ✅ FIX
+            String[] item = new String[7];
+            for (int j = 0; j < 7; j++) {
+                item[j] = recentQueue[current][j];
+            }
+            result[i] = item;
             current = (current + 1) % QUEUE_SIZE;
         }
 
@@ -149,12 +173,7 @@ public class InventoryModel {
     public int getRecentCount() {
         return itemCount;
     }
-    
-
-
-
-
-    
+      
     public int getTop() {
         return top;
     }
@@ -194,5 +213,4 @@ public class InventoryModel {
     public void setDeletedTop(int deletedTop) {
         this.deletedTop = deletedTop;
     }
-
 }

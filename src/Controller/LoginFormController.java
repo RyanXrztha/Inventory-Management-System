@@ -12,11 +12,14 @@ import View.CustomerPanel;
  * @author aryan
  */
 public class LoginFormController {
+    
+    // It validates user and admin login data and directs user or admin to their respective panels.
     public static void Login(LoginForm view) {
 
         String username = view.getUserName().trim();
         String password = view.getPassword().trim();
 
+        //Checks if both username and password are empty
         if (username.isEmpty() && password.isEmpty()) {
             JOptionPane.showMessageDialog(view, "Please enter both username and password", "Both fields are not entered", JOptionPane.WARNING_MESSAGE);
             return;
@@ -32,6 +35,7 @@ public class LoginFormController {
             return;
         }
 
+        //Directs customer/admin to their panel
         if(username.equalsIgnoreCase("RyanXrztha12") && password.equalsIgnoreCase("admin")){
             JOptionPane.showMessageDialog(view, "Welcome Admin", "Login Sucessful", JOptionPane.INFORMATION_MESSAGE);
             AdminPanel admin = new AdminPanel();

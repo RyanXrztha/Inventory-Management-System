@@ -19,6 +19,7 @@ public final class AdminPanelController {
     private int foundIndex = -1;
     private static boolean dataLoaded = false;
     
+    // It initializes the controller and loads initial inventory data.
     public AdminPanelController(AdminPanel view) {
         this.view = view;
         this.model = InventoryModel.geta();
@@ -26,6 +27,7 @@ public final class AdminPanelController {
         loadAdminPanelTable();
     }
     
+    // It loads 5 initial data
     private void loadPresentData() {
         if(dataLoaded) {
         return;
@@ -41,17 +43,25 @@ public final class AdminPanelController {
         
         if(model.getCategoryLinkedList().isEmpty()) {
             for(String[] item : model.getInventoryList()) {
-                model.getCategoryLinkedList().add(item);
+                String[] copy = new String[7];
+                for (int j = 0; j < 7; j++) {
+                    copy[j] = item[j];
+                }
+                model.getCategoryLinkedList().add(copy);
             }
         }
     }
     
+    // It adds a new item into the inventory
     public void push(String itemID, String itemName, String quantity, String costPrice, String price, String category) {
+        
+        // It checks whether inventory table space is available.
         if(model.getTop() == model.getSize() - 1){
             JOptionPane.showMessageDialog(view, "Inventory stack is full");
             return;
         }
         
+        // They validates input fields
         if(itemID.isEmpty()){
             JOptionPane.showMessageDialog(view, "Please enter itemID", "itemID is not entered", JOptionPane.WARNING_MESSAGE);
             return;
@@ -131,6 +141,7 @@ public final class AdminPanelController {
             return;
         }
         
+        // It calculates profit or loss
         double profitLoss;
         try {
             profitLoss = Double.parseDouble(price) - Double.parseDouble(costPrice);
@@ -138,6 +149,7 @@ public final class AdminPanelController {
             profitLoss = 0.0;
         }
         
+        // It stores the item in the stack.
         model.setTop(model.getTop() + 1);
         
         model.getStack()[model.getTop()][0] = itemID;
@@ -148,23 +160,30 @@ public final class AdminPanelController {
         model.getStack()[model.getTop()][5] = category;
         model.getStack()[model.getTop()][6] = String.valueOf(profitLoss);
         
-        String[] record = {
-            itemID, itemName, quantity, costPrice, price, category, String.valueOf(profitLoss)
-        };
+        String[] record = {itemID, itemName, quantity, costPrice, price, category, String.valueOf(profitLoss)};
+        
         model.getInventoryList().add(record);
         
         model.addToRecentQueue(record);
         
                 
-        model.getCategoryLinkedList().add(record);
+        String[] categoryCopy = new String[7];
+            for (int j = 0; j < 7; j++) {
+                categoryCopy[j] = record[j];
+            }
+            model.getCategoryLinkedList().add(categoryCopy);
     }
     
+    // It removes the last item from inventory and stores it in history table.
     public void pop() {
+        
+        // It checks whether inventory is empty
         if(model.getTop() == -1){
             JOptionPane.showMessageDialog(view, "Inventory table is empty.");
             return;
         }
 
+        // It stores item data before deletion
         String itemID = model.getStack()[model.getTop()][0];
         String itemName = model.getStack()[model.getTop()][1];
         String quantity = model.getStack()[model.getTop()][2];
@@ -175,27 +194,26 @@ public final class AdminPanelController {
 
         JOptionPane.showMessageDialog(view, "Deleted: " + itemName);
 
+        // It clears the item from stack
         for(int j = 0; j < 7; j++){
             model.getStack()[model.getTop()][j] = null;
         }
         model.setTop(model.getTop() - 1);
 
-        // Remove from inventoryList
         for(int i = 0; i < model.getInventoryList().size(); i++){
-            if(model.getInventoryList().get(i) != null && 
-               model.getInventoryList().get(i)[0] != null &&
-               model.getInventoryList().get(i)[0].equals(itemID)){
+            if(model.getInventoryList().get(i) != null && model.getInventoryList().get(i)[0] != null && model.getInventoryList().get(i)[0].equals(itemID)){
                 model.getInventoryList().remove(i);
                 break;
             }
         }
 
         model.removeFromRecentQueue(itemID);
+        model.rebuildRecentQueue();
 
-        // Add to deleted stack
         if(model.getDeletedTop() == model.getfullSize() - 1){
             JOptionPane.showMessageDialog(view, "Item deleted history is full");
         } else {
+            // It moves the item into deleted history
             model.setDeletedTop(model.getDeletedTop() + 1);
             model.getDeletedStack()[model.getDeletedTop()][0] = itemID;
             model.getDeletedStack()[model.getDeletedTop()][1] = itemName;
@@ -207,9 +225,7 @@ public final class AdminPanelController {
         }
 
         for(int i = 0; i < model.getCategoryLinkedList().size(); i++){
-            if(model.getCategoryLinkedList().get(i) != null && 
-               model.getCategoryLinkedList().get(i)[0] != null &&
-               model.getCategoryLinkedList().get(i)[0].equals(itemID)){
+            if(model.getCategoryLinkedList().get(i) != null && model.getCategoryLinkedList().get(i)[0] != null && model.getCategoryLinkedList().get(i)[0].equals(itemID)){
                 model.getCategoryLinkedList().remove(i);
                 break;
             }
@@ -217,13 +233,15 @@ public final class AdminPanelController {
     }
     
 
+    // It restores the most recently deleted item back to inventory.
     public void recoverItem() {
+        // It checks whether deleted history is empty
         if(model.getDeletedTop() == -1){
             JOptionPane.showMessageDialog(view, "No items in deleted history table to recover");
             return;
         }
 
-        // Get the most recently deleted item (from top of deleted stack) 
+        // It copies the deleted item back to inventory
         String itemID = model.getDeletedStack()[model.getDeletedTop()][0];
         String itemName = model.getDeletedStack()[model.getDeletedTop()][1];
         String quantity = model.getDeletedStack()[model.getDeletedTop()][2];
@@ -232,22 +250,16 @@ public final class AdminPanelController {
         String category = model.getDeletedStack()[model.getDeletedTop()][5];
         String profitLoss = model.getDeletedStack()[model.getDeletedTop()][6];
 
-        // Check if item ID already exists in current inventory
         if (isDuplicateItemID(itemID)) {
-            JOptionPane.showMessageDialog(view, 
-                "Cannot recover: Item with ID '" + itemID + "' already exists in inventory!", 
-                "Duplicate Item ID", 
-                JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(view, "Cannot recover: Item with ID '" + itemID + "' already exists in inventory!", "Duplicate Item ID", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        // Check if main stack has space
         if(model.getTop() == model.getSize() - 1){
             JOptionPane.showMessageDialog(view, "Inventory stack is full. Cannot recover item.");
             return;
         }
 
-        // Add to main stack
         model.setTop(model.getTop() + 1);
         model.getStack()[model.getTop()][0] = itemID;
         model.getStack()[model.getTop()][1] = itemName;
@@ -262,9 +274,13 @@ public final class AdminPanelController {
 
         model.addToRecentQueue(record);
         
-        model.getCategoryLinkedList().add(record);
+        String[] categoryCopy = new String[7];
+        for (int j = 0; j < 7; j++) {
+            categoryCopy[j] = record[j];
+        }
+        model.getCategoryLinkedList().add(categoryCopy);
 
-        // Remove from deleted stack
+         // It removes the item from deleted history
         for(int j = 0; j < 7; j++){
             model.getDeletedStack()[model.getDeletedTop()][j] = null;
         }
@@ -290,6 +306,7 @@ public final class AdminPanelController {
         model.setDeletedTop(model.getDeletedTop() - 1);
     }
     
+    // It checks whether an item ID already exists.
     private boolean isDuplicateItemID(String itemID) {
         if (model.getTop() == -1) {
             return false;
@@ -304,6 +321,7 @@ public final class AdminPanelController {
         return false;
     }
     
+    // It loads inventory data in the admin table
     public void loadAdminPanelTable() {
         DefaultTableModel tableModel = (DefaultTableModel) view.getjTable3().getModel();
         tableModel.setRowCount(0);
@@ -351,6 +369,7 @@ public final class AdminPanelController {
     }
     
     
+    // It searches an item using binary search.
     public int searchID(String searchValue, ArrayList<String[]> inventoryList, int low, int high) {
 
         if (low > high) {
@@ -383,7 +402,6 @@ public final class AdminPanelController {
             return;
         }
 
-        // Sort by Item ID
         for (int i = 0; i < list.size() - 1; i++) {
             for (int j = 0; j < list.size() - i - 1; j++) {
                 if (list.get(j)[0].compareToIgnoreCase(list.get(j + 1)[0]) > 0) {
@@ -509,31 +527,36 @@ public final class AdminPanelController {
         }
 
         String[] oldRecord = list.get(foundIndex);
-        String oldItemID = oldRecord[0]; // Store old ID
+        String oldItemID = oldRecord[0];
 
-        String[] newRecord = {
-            itemID, 
-            itemName, 
-            quantity, 
-            costPrice, 
-            price, 
-            category, 
-            String.valueOf(profitLoss)
-        };
+        String[] newRecord = {itemID, itemName, quantity, costPrice, price, category, String.valueOf(profitLoss)};
 
         list.set(foundIndex, newRecord);
 
         for (int i = 0; i <= model.getTop(); i++) {
             if (model.getStack()[i][0] != null && model.getStack()[i][0].equals(oldItemID)) {
-                model.getStack()[i] = newRecord.clone(); // Use clone to create independent copy
+                model.getStack()[i][0] = itemID;
+                model.getStack()[i][1] = itemName;
+                model.getStack()[i][2] = quantity;
+                model.getStack()[i][3] = costPrice;
+                model.getStack()[i][4] = price;
+                model.getStack()[i][5] = category;
+                model.getStack()[i][6] = String.valueOf(profitLoss);
                 break;
             }
         }
 
         for (int i = 0; i < model.getCategoryLinkedList().size(); i++) {
-            if (model.getCategoryLinkedList().get(i)[0] != null && 
-                model.getCategoryLinkedList().get(i)[0].equals(oldItemID)) {
-                model.getCategoryLinkedList().set(i, newRecord.clone());
+            if (model.getCategoryLinkedList().get(i)[0] != null && model.getCategoryLinkedList().get(i)[0].equals(oldItemID)) {
+                String[] categoryRecord = new String[7];
+                categoryRecord[0] = itemID;
+                categoryRecord[1] = itemName;
+                categoryRecord[2] = quantity;
+                categoryRecord[3] = costPrice;
+                categoryRecord[4] = price;
+                categoryRecord[5] = category;
+                categoryRecord[6] = String.valueOf(profitLoss);
+                model.getCategoryLinkedList().set(i, categoryRecord);
                 break;
             }
         }
@@ -560,19 +583,12 @@ public final class AdminPanelController {
 
         for(int i = 0; i < list.size(); i++){
             if(list.get(i)[0] != null){
-                tableModel.addRow(new Object[]{
-                    list.get(i)[0],
-                    list.get(i)[1],
-                    list.get(i)[2],
-                    list.get(i)[3],
-                    list.get(i)[4],
-                    list.get(i)[5],
-                    list.get(i)[6]
-                });
+                tableModel.addRow(new Object[]{list.get(i)[0], list.get(i)[1], list.get(i)[2], list.get(i)[3], list.get(i)[4], list.get(i)[5], list.get(i)[6]});
             }
         }
     }
 
+    // It sorts items by ID.
     public void sortByID(boolean ascending) {
         ArrayList<String[]> list = model.getInventoryList();
         int size = list.size();
@@ -750,7 +766,6 @@ public final class AdminPanelController {
         return;
     }
 
-    // Find all matching items
     ArrayList<Integer> foundIndices = new ArrayList<>();
     for (int i = 0; i < list.size(); i++) {
         if (list.get(i)[1].toLowerCase().contains(itemName.toLowerCase())) {
@@ -764,7 +779,6 @@ public final class AdminPanelController {
         return;
     }
 
-    // If multiple items are found
     if (foundIndices.size() > 1) {
         String message = "Multiple items found!\n";
         for (int i = 0; i < foundIndices.size(); i++) {
@@ -779,14 +793,12 @@ public final class AdminPanelController {
             message += "Profit/Loss: " + record[6] + "\n\n";
         }
         message += "Multiple items found. Please search by Item ID to update a specific item.";
-        JOptionPane.showMessageDialog(view, message, "Multiple Search Results", 
-                                      JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(view, message, "Multiple Search Results", JOptionPane.INFORMATION_MESSAGE);
         
         foundIndex = -1;
         return;
     }
 
-    // Single item is found
     foundIndex = foundIndices.get(0);
     String[] record = list.get(foundIndex);
 
@@ -800,8 +812,7 @@ public final class AdminPanelController {
             "Category: " + record[5] + "\n" +
             "Profit/Loss: " + record[6];
 
-    JOptionPane.showMessageDialog(view, message, "Search Result", 
-                                  JOptionPane.INFORMATION_MESSAGE);
+    JOptionPane.showMessageDialog(view, message, "Search Result", JOptionPane.INFORMATION_MESSAGE);
 
     view.setChangedFields(record[0], record[1], record[2], record[3], record[4], record[5]);
 }
@@ -871,7 +882,6 @@ public final class AdminPanelController {
         return;
     }
 
-    // If multiple items are found
     if (foundIndices.size() > 1) {
         String message = "Multiple deleted items found!\n\n";
         for (int i = 0; i < foundIndices.size(); i++) {
@@ -886,8 +896,7 @@ public final class AdminPanelController {
             message += "Profit/Loss: " + record[6] + "\n\n";
         }
         message += "Multiple items found. Please search by Item ID for specific details.";
-        JOptionPane.showMessageDialog(view, message, "Multiple Deleted Items Found", 
-                                      JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(view, message, "Multiple Deleted Items Found", JOptionPane.INFORMATION_MESSAGE);
         return;
     }
 
@@ -903,13 +912,12 @@ public final class AdminPanelController {
             "Category: " + record[5] + "\n" +
             "Profit/Loss: " + record[6];
 
-    JOptionPane.showMessageDialog(view, message, "Deleted Item Search Result", 
-                                  JOptionPane.INFORMATION_MESSAGE);
+    JOptionPane.showMessageDialog(view, message, "Deleted Item Search Result", JOptionPane.INFORMATION_MESSAGE);
 }
 
 
     
-        
+    // It filters items based on category.
     public void filterByCategory(String category) {
         DefaultTableModel tableModel = (DefaultTableModel) view.getjTable4().getModel();
         tableModel.setRowCount(0);
@@ -922,7 +930,6 @@ public final class AdminPanelController {
         }
 
         if(category.equals("All Categories")) {
-            // Show all items
             for(int i = categoryList.size() - 1; i >= 0; i--) {
                 String[] item = categoryList.get(i);
                 if(item[0] != null) {
@@ -932,7 +939,6 @@ public final class AdminPanelController {
                 }
             }
         } else {
-            // Filter by specific category
             boolean found = false;
             for(int i = categoryList.size() - 1; i >= 0; i--) {
                 String[] item = categoryList.get(i);
@@ -948,7 +954,5 @@ public final class AdminPanelController {
                 JOptionPane.showMessageDialog(view, "No items found in category: " + category);
             }
         }
-    }
-        
-        
+    }      
 }
